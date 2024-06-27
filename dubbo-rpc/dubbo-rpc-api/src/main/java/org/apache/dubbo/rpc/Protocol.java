@@ -62,6 +62,8 @@ public interface Protocol {
      * Get default port when user doesn't config the port.
      *
      * @return default port
+     *
+     * 服务端暴露端口
      */
     int getDefaultPort();
 
@@ -77,6 +79,8 @@ public interface Protocol {
      * @param invoker Service invoker
      * @return exporter reference for exported service, useful for unexport the service later
      * @throws RpcException thrown when error occurs during export the service, for example: port is occupied
+     *
+     * 服务端暴露方式
      */
     @Adaptive
     <T> Exporter<T> export(Invoker<T> invoker) throws RpcException;
@@ -95,6 +99,8 @@ public interface Protocol {
      * @param url  URL address for the remote service
      * @return invoker service's local proxy
      * @throws RpcException when there's any error while connecting to the service provider
+     *
+     * 客户端引用方式
      */
     @Adaptive
     <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException;
@@ -104,6 +110,8 @@ public interface Protocol {
      * 1. Cancel all services this protocol exports and refers <br>
      * 2. Release all occupied resources, for example: connection, port, etc. <br>
      * 3. Protocol can continue to export and refer new service even after it's destroyed.
+     *
+     * 销毁方式，服务端、客户端都使用
      */
     void destroy();
 

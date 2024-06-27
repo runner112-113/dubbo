@@ -125,6 +125,7 @@ public class ExtensionLoader<T> {
     private final Map<String, Object> cachedActivates = Collections.synchronizedMap(new LinkedHashMap<>());
     private final Map<String, Set<String>> cachedActivateGroups = Collections.synchronizedMap(new LinkedHashMap<>());
     private final Map<String, String[][]> cachedActivateValues = Collections.synchronizedMap(new LinkedHashMap<>());
+    /** 记录扩展名称与对应持有扩展类型实例的 {@link Holder} 对象 */
     private final ConcurrentMap<String, Holder<Object>> cachedInstances = new ConcurrentHashMap<>();
     private final Holder<Object> cachedAdaptiveInstance = new Holder<>();
     private volatile Class<?> cachedAdaptiveClass = null;
@@ -511,6 +512,7 @@ public class ExtensionLoader<T> {
     }
 
     private Holder<Object> getOrCreateHolder(String name) {
+        // 先尝试从缓存中获取
         Holder<Object> holder = cachedInstances.get(name);
         if (holder == null) {
             cachedInstances.putIfAbsent(name, new Holder<>());
@@ -558,18 +560,21 @@ public class ExtensionLoader<T> {
             throw new IllegalArgumentException("Extension name == null");
         }
         if ("true".equals(name)) {
+            // 获取默认的实现类
             return getDefaultExtension();
         }
         String cacheKey = name;
         if (!wrap) {
             cacheKey += "_origin";
         }
+        // 获取指定名称的扩展类型实例
         final Holder<Object> holder = getOrCreateHolder(cacheKey);
         Object instance = holder.get();
         if (instance == null) {
             synchronized (holder) {
                 instance = holder.get();
                 if (instance == null) {
+                    // 创建扩展类型实现
                     instance = createExtension(name, wrap);
                     holder.set(instance);
                 }
@@ -768,16 +773,20 @@ public class ExtensionLoader<T> {
 
     @SuppressWarnings("unchecked")
     private T createExtension(String name, boolean wrap) {
+        // 获取扩展名称对应的实现类 Class 对象
         Class<?> clazz = getExtensionClasses().get(name);
         if (clazz == null || unacceptableExceptions.contains(name)) {
             throw findException(name);
         }
         try {
+            // 尝试从缓存中获取对应的实例
             T instance = (T) extensionInstances.get(clazz);
             if (instance == null) {
+                // 反射实例化
                 extensionInstances.putIfAbsent(clazz, createExtensionInstance(clazz));
                 instance = (T) extensionInstances.get(clazz);
                 instance = postProcessBeforeInitialization(instance, name);
+                // 执行 setter 注入
                 injectExtension(instance);
                 instance = postProcessAfterInitialization(instance, name);
             }
@@ -798,6 +807,7 @@ public class ExtensionLoader<T> {
                                                 || ArrayUtils.contains(wrapper.matches(), name))
                                         && !ArrayUtils.contains(wrapper.mismatches(), name));
                         if (match) {
+                            // 采用包装类逐层包装
                             instance = injectExtension(
                                     (T) wrapperClass.getConstructor(type).newInstance(instance));
                             instance = postProcessAfterInitialization(instance, name);
@@ -955,6 +965,7 @@ public class ExtensionLoader<T> {
                 classes = cachedClasses.get();
                 if (classes == null) {
                     try {
+                        // 加载当前类型的 SPI 配置
                         classes = loadExtensionClasses();
                     } catch (InterruptedException e) {
                         logger.error(
@@ -983,6 +994,7 @@ public class ExtensionLoader<T> {
 
         Map<String, Class<?>> extensionClasses = new HashMap<>();
 
+        // 从 META-INF/dubbo/internal/、META-INF/dubbo/，以及 META-INF/services/ 目录下检索 SPI 配置
         for (LoadingStrategy strategy : strategies) {
             loadDirectory(extensionClasses, strategy, type.getName());
 

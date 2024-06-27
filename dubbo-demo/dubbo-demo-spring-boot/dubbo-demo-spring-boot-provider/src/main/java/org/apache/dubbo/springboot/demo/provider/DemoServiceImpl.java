@@ -23,6 +23,7 @@ import org.apache.dubbo.springboot.demo.DemoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 @DubboService
 public class DemoServiceImpl implements DemoService {
 

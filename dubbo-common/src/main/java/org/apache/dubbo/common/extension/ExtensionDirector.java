@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ExtensionDirector implements ExtensionAccessor {
 
+    /** 缓存扩展类型及其绑定的 ExtensionLoader 对象（每一个扩展类型都拥有属于自己的 ExtensionLoader） */
     private final ConcurrentMap<Class<?>, ExtensionLoader<?>> extensionLoadersMap = new ConcurrentHashMap<>(64);
     private final ConcurrentMap<Class<?>, ExtensionScope> extensionScopeMap = new ConcurrentHashMap<>(64);
     private final ExtensionDirector parent;
@@ -69,9 +70,11 @@ public class ExtensionDirector implements ExtensionAccessor {
         if (type == null) {
             throw new IllegalArgumentException("Extension type == null");
         }
+        // 必须是接口类型
         if (!type.isInterface()) {
             throw new IllegalArgumentException("Extension type (" + type + ") is not an interface!");
         }
+        // 必须被 @SPI 注解
         if (!withExtensionAnnotation(type)) {
             throw new IllegalArgumentException("Extension type (" + type
                     + ") is not an extension, because it is NOT annotated with @" + SPI.class.getSimpleName() + "!");

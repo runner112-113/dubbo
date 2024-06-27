@@ -259,6 +259,7 @@ public class ServiceAnnotationPostProcessor
                             + serviceClasses);
                 }
 
+                // 在此处构建了 ServiceBean 的BeanDefinition
                 for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
                     processScannedBeanDefinition(beanDefinitionHolder);
                     servicePackagesHolder.addScannedClass(
