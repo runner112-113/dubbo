@@ -44,7 +44,7 @@ import static org.apache.dubbo.rpc.Constants.LOCAL_PROTOCOL;
  * ListenerProtocol
  */
 @Activate(order = 200)
-public class ProtocolListenerWrapper implements Protocol {
+public class    ProtocolListenerWrapper implements Protocol {
 
     private final Protocol protocol;
 

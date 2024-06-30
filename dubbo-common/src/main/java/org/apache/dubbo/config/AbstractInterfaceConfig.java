@@ -872,9 +872,12 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     }
 
     protected void initServiceMetadata(AbstractInterfaceConfig interfaceConfig) {
+        // 拿到Provider的version
         serviceMetadata.setVersion(getVersion(interfaceConfig));
+        // 拿到Provider的group
         serviceMetadata.setGroup(getGroup(interfaceConfig));
         serviceMetadata.setDefaultGroup(getGroup(interfaceConfig));
+        // 设置接口的名称
         serviceMetadata.setServiceInterfaceName(getInterface());
     }
 

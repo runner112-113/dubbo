@@ -474,7 +474,9 @@ public class DefaultModuleDeployer extends AbstractDeployer<ModuleModel> impleme
             asyncExportingFutures.add(future);
         } else {
             if (!sc.isExported()) {
+                // 暴露服务
                 sc.export(RegisterTypeEnum.AUTO_REGISTER_BY_DEPLOYER);
+                // 记录暴露了的服务
                 exportedServices.add(sc);
             }
         }

@@ -112,7 +112,9 @@ public class ModuleServiceRepository {
     }
 
     public void registerProvider(ProviderModel providerModel) {
+        // 本地缓存serviceKey ---> providerModel
         providers.putIfAbsent(providerModel.getServiceKey(), providerModel);
+        // 本地缓存 （后面会使用这个）
         frameworkServiceRepository.registerProvider(providerModel);
     }
 

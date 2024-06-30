@@ -49,21 +49,34 @@ import java.util.concurrent.locks.Lock;
  * ApplicationModel includes many ProviderModel which is about published services
  * and many Consumer Model which is about subscribed services.
  * <p>
+ *
+ *
+ *     ApplicationModel 表示正在使用Dubbo的应用程序，并存储基本元数据信息，以便在RPC调用过程中使用。
+ *     ApplicationModel包括许多关于发布服务的ProviderModel和许多关于订阅服务的Consumer Model
  */
 public class ApplicationModel extends ScopeModel {
     protected static final Logger LOGGER = LoggerFactory.getLogger(ApplicationModel.class);
     public static final String NAME = "ApplicationModel";
+    // 所有ModuleModel实例对象集合
     private final List<ModuleModel> moduleModels = new CopyOnWriteArrayList<>();
+    // 发布的ModuleModel实例对象集合
     private final List<ModuleModel> pubModuleModels = new CopyOnWriteArrayList<>();
+    // 环境信息Environment实例对象
     private volatile Environment environment;
+    // 配置管理ConfigManager实例对象
     private volatile ConfigManager configManager;
+    // 服务存储库ServiceRepository实例对象
     private volatile ServiceRepository serviceRepository;
+    // 应用程序部署器ApplicationDeployer实例对象
     private volatile ApplicationDeployer deployer;
 
+    // 所属框架FrameworkModel实例对象
     private final FrameworkModel frameworkModel;
 
+    // 内部的模块模型ModuleModel实例对象
     private final ModuleModel internalModule;
 
+    // 默认的模块模型ModuleModel实例对象
     private volatile ModuleModel defaultModule;
 
     // internal module index is 0, default module index is 1

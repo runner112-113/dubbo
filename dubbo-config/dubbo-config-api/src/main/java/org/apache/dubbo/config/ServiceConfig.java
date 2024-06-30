@@ -298,8 +298,11 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             this.serviceListeners.addAll(extensionLoader.getSupportedExtensionInstances());
         }
         initServiceMetadata(provider);
+        // 设置接口的Class类型
         serviceMetadata.setServiceType(getInterfaceClass());
+        // 设置具体的实现类
         serviceMetadata.setTarget(getRef());
+        // 生成serviceKey：group/serviceInterfaceName:version
         serviceMetadata.generateServiceKey();
     }
 
@@ -538,6 +541,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             path = interfaceName;
         }
         doExportUrls(registerType);
+        // 触发ServiceListener的exported方法
         exported();
     }
 
@@ -556,6 +560,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         } else {
             serviceDescriptor = repository.registerService(getInterfaceClass());
         }
+
+        // 具备反射纸执行的ProviderModel
         providerModel = new ProviderModel(
                 serviceMetadata.getServiceKey(),
                 ref,
@@ -588,6 +594,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
     private void doExportUrlsFor1Protocol(
             ProtocolConfig protocolConfig, List<URL> registryURLs, RegisterTypeEnum registerType) {
+        // 构建注册协议的Attribute
         Map<String, String> map = buildAttributes(protocolConfig);
 
         // remove null key and null value
@@ -595,6 +602,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         // init serviceMetadata attachments
         serviceMetadata.getAttachments().putAll(map);
 
+        // 构建最终的注册url
         URL url = buildUrl(protocolConfig, map);
 
         processServiceExecutor(url);

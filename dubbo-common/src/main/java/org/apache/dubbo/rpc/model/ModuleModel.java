@@ -36,16 +36,23 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * Model of a service module
+ *
+ * 服务模块的模型
  */
 public class ModuleModel extends ScopeModel {
     private static final Logger logger = LoggerFactory.getLogger(ModuleModel.class);
 
     public static final String NAME = "ModuleModel";
 
+    // 所属应用程序模型ApplicationModel实例对象
     private final ApplicationModel applicationModel;
+    // 模块服务存储库ModuleServiceRepository实例对象
     private volatile ModuleServiceRepository serviceRepository;
+    // 模块环境信息ModuleEnvironment实例对象
     private volatile ModuleEnvironment moduleEnvironment;
+    // 模块的服务配置管理ModuleConfigManager实例对象
     private volatile ModuleConfigManager moduleConfigManager;
+    // 模块部署器ModuleDeployer实例对象deployer用于导出和引用服务
     private volatile ModuleDeployer deployer;
     private boolean lifeCycleManagedExternally = false;
 

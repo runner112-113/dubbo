@@ -164,6 +164,7 @@ public class ServiceInstancesChangedListener {
             String revision = entry.getKey();
             List<ServiceInstance> subInstances = entry.getValue();
 
+            // 远程获取元信息
             MetadataInfo metadata = subInstances.stream()
                     .map(ServiceInstance::getServiceMetadata)
                     .filter(Objects::nonNull)
@@ -176,6 +177,7 @@ public class ServiceInstancesChangedListener {
             for (ServiceInstance tmpInstance : subInstances) {
                 MetadataInfo originMetadata = tmpInstance.getServiceMetadata();
                 if (originMetadata == null || !Objects.equals(originMetadata.getRevision(), metadata.getRevision())) {
+                    // 填充元信息
                     tmpInstance.setServiceMetadata(metadata);
                 }
             }

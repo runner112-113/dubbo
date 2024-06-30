@@ -268,6 +268,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
         // load config centers
         configManager.loadConfigsOfTypeFromProps(ConfigCenterConfig.class);
 
+        // 将注册中心作为配置中心
         useRegistryAsConfigCenterIfNecessary();
 
         // check Config Center
@@ -304,6 +305,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
 
     private void startMetadataCenter() {
 
+        // 使用注册中心作为默认的元数据中心
         useRegistryAsMetadataCenterIfNecessary();
 
         ApplicationConfig applicationConfig = getApplication();
@@ -741,6 +743,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
 
     private void startModules() {
         // ensure init and start internal module first
+        // 确保内部的module先deploy
         prepareInternalModule();
 
         // filter and start pending modules, ignore new module during starting, throw exception of module start

@@ -39,6 +39,7 @@ public class FrameworkServiceRepository {
     private final FrameworkModel frameworkModel;
 
     // useful to find a provider model quickly with group/serviceInterfaceName:version
+    // serviceKey ---> ProviderModel
     private final ConcurrentMap<String, ProviderModel> providers = new ConcurrentHashMap<>();
 
     // useful to find a provider model quickly with serviceInterfaceName:version
