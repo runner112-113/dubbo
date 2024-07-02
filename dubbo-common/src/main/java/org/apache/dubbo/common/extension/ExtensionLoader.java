@@ -423,8 +423,10 @@ public class ExtensionLoader<T> {
 
             // traverse all cached extensions
             cachedActivateGroups.forEach((name, activateGroup) -> {
-                if (isMatchGroup(group, activateGroup)// Group匹配
-                        && !namesSet.contains(name)// 被Key指定的扩展点后面会加载
+                // Group匹配
+                if (isMatchGroup(group, activateGroup)
+                        // 被Key指定的扩展点后面会加载
+                        && !namesSet.contains(name)
                         && !namesSet.contains(REMOVE_VALUE_PREFIX + name)
                         // Value匹配
                         && isActive(cachedActivateValues.get(name), url)) {

@@ -73,7 +73,9 @@ public class ProtocolFilterWrapper implements Protocol {
         if (UrlUtils.isRegistry(url)) {
             return protocol.refer(type, url);
         }
+        // 获取FilterChainBuilder 默认的只有一个DefaultFilterChainBuilder
         FilterChainBuilder builder = getFilterChainBuilder(url);
+        // 获取所有Activate的Filter，并为Invoker构建拦截器链
         return builder.buildInvokerChain(protocol.refer(type, url), REFERENCE_FILTER_KEY, CommonConstants.CONSUMER);
     }
 

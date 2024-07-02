@@ -138,10 +138,10 @@ public class SimpleReferenceCache implements ReferenceCache {
 
         //前面是从缓存中拿，如果缓存中获取不到则开始引用服务
         if (proxy == null) {
-            //获取或者创建值，为引用类型referencesOfType对象（类型为Map<Class<?>, List<ReferenceConfigBase<?>>>）缓存对象生成值（值不存在时候会生成一个）
+            // 获取或者创建值，为引用类型referencesOfType对象（类型为Map<Class<?>, List<ReferenceConfigBase<?>>>）缓存对象生成值（值不存在时候会生成一个）
             List<ReferenceConfigBase<?>> referencesOfType = ConcurrentHashMapUtils.computeIfAbsent(
                     referenceTypeMap, type, _t -> Collections.synchronizedList(new ArrayList<>()));
-            //每次走到这里都会添加一个ReferenceConfigBase 引用配置对象（单例的从缓存中拿到就可以直接返回了）
+            // 每次走到这里都会添加一个ReferenceConfigBase 引用配置对象（单例的从缓存中拿到就可以直接返回了）
             referencesOfType.add(rc);
 
             //与前面一样 前面是类型映射，这里是key映射
@@ -149,7 +149,7 @@ public class SimpleReferenceCache implements ReferenceCache {
                     referenceKeyMap, key, _k -> Collections.synchronizedList(new ArrayList<>()));
             // 加入缓存
             referenceConfigList.add(rc);
-            //开始引用服务
+            // 引用服务
             proxy = rc.get(check);
         }
 
