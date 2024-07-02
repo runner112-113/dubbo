@@ -226,6 +226,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             throw new IllegalStateException("The invoker of ReferenceConfig(" + url + ") has already destroyed!");
         }
 
+        //ref类型为 transient volatile T ref;
         if (ref == null) {
             if (getScopeModel().isLifeCycleManagedExternally()) {
                 // prepare model for reference
@@ -333,14 +334,18 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             }
 
             // init serviceMetadata
+            // 初始化ServiceMetadata类型对象serviceMetadata 为其设置服务基本属性比如版本号，分组，服务接口名
             initServiceMetadata(consumer);
 
+            // 初始化元数据信息 服务接口类型和key
             serviceMetadata.setServiceType(getServiceInterfaceClass());
             // TODO, uncomment this line once service key is unified
             serviceMetadata.generateServiceKey();
 
+            // 配置转Map类型
             Map<String, String> referenceParameters = appendConfig();
 
+            // 本地内存模块服务存储库
             ModuleServiceRepository repository = getScopeModel().getServiceRepository();
             ServiceDescriptor serviceDescriptor;
             if (CommonConstants.NATIVE_STUB.equals(getProxy())) {
@@ -350,6 +355,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             } else {
                 serviceDescriptor = repository.registerService(interfaceClass);
             }
+            //消费者模型对象
             consumerModel = new ConsumerModel(
                     serviceMetadata.getServiceKey(),
                     proxy,
@@ -363,13 +369,17 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             // version.
             consumerModel.setConfig(this);
 
+            // 本地存储库注册消费者模型对象
             repository.registerConsumer(consumerModel);
 
+            //与前面代码一样基础初始化服务元数据对象为其设置附加参数
             serviceMetadata.getAttachments().putAll(referenceParameters);
 
             // 创建代理对象
+            //创建服务的代理对象
             ref = createProxy(referenceParameters);
 
+            //为服务元数据对象设置代理对象
             serviceMetadata.setTarget(ref);
             serviceMetadata.addAttribute(PROXY_CLASS_REF, ref);
 
@@ -378,6 +388,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             consumerModel.initMethodModels();
 
             if (check) {
+                //检查invoker对象初始结果
                 checkInvokerAvailable(0);
             }
         } catch (Throwable t) {
@@ -479,11 +490,14 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
 
         if (StringUtils.isNotEmpty(url)) {
             // user specified URL, could be peer-to-peer address, or register center's address.
+            // url存在则为点对点引用  直连生产者
             parseUrl(referenceParameters);
         } else {
             // if protocols not in jvm checkRegistry
+            // 从注册表中获取URL并将其聚合。这个其实就是初始化一下注册中心的url配置
             aggregateUrlFromRegistry(referenceParameters);
         }
+        // 创建远程引用，创建远程引用调用器
         createInvoker();
 
         if (logger.isInfoEnabled()) {
@@ -500,7 +514,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 referenceParameters.get(INTERFACE_KEY),
                 referenceParameters);
         consumerUrl = consumerUrl.setScopeModel(getScopeModel());
-        consumerUrl = consumerUrl.setServiceModel(consumerModel);
+        consumerUrl = consumerUrl.setServiceModel(consumerModel); // 上报消费者元数据， report-consumer-definition设置为true才会上报
         MetadataUtils.publishServiceDefinition(consumerUrl, consumerModel.getServiceModel(), getApplicationModel());
 
         // create service proxy
@@ -588,6 +602,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
      * Parse the directly configured url.
      */
     private void parseUrl(Map<String, String> referenceParameters) {
+        // ,分割 点对点直连url
         String[] us = SEMICOLON_SPLIT_PATTERN.split(url);
         if (ArrayUtils.isNotEmpty(us)) {
             for (String u : us) {
@@ -597,6 +612,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 }
                 url = url.setScopeModel(getScopeModel());
                 url = url.setServiceModel(consumerModel);
+                // 解析，保存到urls集合
                 if (UrlUtils.isRegistry(url)) {
                     urls.add(url.putAttribute(REFER_KEY, referenceParameters));
                 } else {
@@ -617,6 +633,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
      */
     private void aggregateUrlFromRegistry(Map<String, String> referenceParameters) {
         checkRegistry();
+        // 加载注册中心URL
         List<URL> us = ConfigValidationUtils.loadRegistries(this, false);
         if (CollectionUtils.isNotEmpty(us)) {
             for (URL u : us) {
@@ -629,10 +646,13 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 if (isInjvm() != null && isInjvm()) {
                     u = u.addParameter(LOCAL_PROTOCOL, true);
                 }
+                // 给注册中心URL添加要引用的服务参数:refer
                 urls.add(u.putAttribute(REFER_KEY, referenceParameters));
             }
         }
+        // 如果在同一个JVM里，Consumer要引用的服务自身已经提供了，那么Dubbo会尝试直接引用同一个JVM内的服务，这样可以避免网络传输带来的性能损耗
         if (urls.isEmpty() && shouldJvmRefer(referenceParameters)) {
+            // 优先引用同一个JVM内的Provider
             URL injvmUrl = new URL(LOCAL_PROTOCOL, LOCALHOST_VALUE, 0, interfaceClass.getName())
                     .addParameters(referenceParameters);
             injvmUrl = injvmUrl.setScopeModel(getScopeModel());
@@ -652,8 +672,11 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void createInvoker() {
+        // 这个url 为注册协议如：
+        // registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=dubbo-demo-api-consumer&dubbo=2.0.2&pid=6204&qos.enable=false&qos.port=-1&registry=zookeeper&release=3.0.9&timestamp=1657439419495
         if (urls.size() == 1) {
             URL curUrl = urls.get(0);
+            // 这个SPI对象是由字节码动态生成的自适应对象Protocol$Adaptie
             invoker = protocolSPI.refer(interfaceClass, curUrl);
             // registry url, mesh-enable and unloadClusterRelated is true, not need Cluster.
             if (!UrlUtils.isRegistry(curUrl) && !curUrl.getParameter(UNLOAD_CLUSTER_RELATED, false)) {

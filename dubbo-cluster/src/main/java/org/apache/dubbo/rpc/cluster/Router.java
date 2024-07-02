@@ -31,6 +31,9 @@ import java.util.List;
  *
  * @see org.apache.dubbo.rpc.cluster.Cluster#join(Directory, boolean)
  * @see org.apache.dubbo.rpc.cluster.Directory#list(Invocation)
+ *
+ *
+ * Router 使用 Directory 提供的 Invoker 列表，根据路由规则过滤和选择合适的 Invoker。
  */
 public interface Router extends Comparable<Router> {
 
@@ -67,6 +70,8 @@ public interface Router extends Comparable<Router> {
      * @param needToPrintMessage whether to print router state. Such as `use router branch a`.
      * @return state with route result
      * @throws RpcException
+     *
+     * 根据路由规则选择合适的服务提供者
      */
     default <T> RouterResult<Invoker<T>> route(
             List<Invoker<T>> invokers, URL url, Invocation invocation, boolean needToPrintMessage) throws RpcException {
@@ -87,6 +92,8 @@ public interface Router extends Comparable<Router> {
      * rule change.
      *
      * @return true if the router need to execute every time.
+     *
+     * 判断是否在运行时执行路由。
      */
     boolean isRuntime();
 
@@ -96,6 +103,8 @@ public interface Router extends Comparable<Router> {
      * default this value to false.
      *
      * @return true to execute if none of invokers matches the current router
+     *
+     * 判断是否强制执行路由
      */
     boolean isForce();
 
@@ -103,6 +112,8 @@ public interface Router extends Comparable<Router> {
      * Router's priority, used to sort routers.
      *
      * @return router's priority
+     *
+     * 获取路由器的优先级
      */
     int getPriority();
 

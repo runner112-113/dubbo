@@ -431,6 +431,9 @@ public class RegistryDirectory<T> extends DynamicDirectory<T> {
      * @param oldUrlInvokerMap it might be modified during the process.
      * @param urls
      * @return invokers
+     *
+     *
+     * 将ProviderUrl转换成对应的Invoker
      */
     private Map<URL, Invoker<T>> toInvokers(Map<URL, Invoker<T>> oldUrlInvokerMap, List<URL> urls) {
         Map<URL, Invoker<T>> newUrlInvokerMap =
@@ -439,6 +442,7 @@ public class RegistryDirectory<T> extends DynamicDirectory<T> {
             return newUrlInvokerMap;
         }
         String queryProtocols = this.queryMap.get(PROTOCOL_KEY);
+        // 便利所有的urls将其包装为Invoker
         for (URL providerUrl : urls) {
             if (!checkProtocolValid(queryProtocols, providerUrl)) {
                 continue;
@@ -459,6 +463,7 @@ public class RegistryDirectory<T> extends DynamicDirectory<T> {
                         enabled = url.getParameter(ENABLED_KEY, true);
                     }
                     if (enabled) {
+                        // 协议引用获得Invoker  真正的获取Invoker
                         invoker = protocol.refer(serviceType, url);
                     }
                 } catch (Throwable t) {

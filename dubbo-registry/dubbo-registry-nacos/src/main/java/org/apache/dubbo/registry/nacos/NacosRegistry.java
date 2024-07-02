@@ -174,6 +174,7 @@ public class NacosRegistry extends FailbackRegistry {
     @Override
     public void doRegister(URL url) {
         try {
+            // 消费端配置rdubbo.registry.parameters.register-consumer-url=true才会注册 默认是false不会注册
             if (PROVIDER_SIDE.equals(url.getSide()) || getUrl().getParameter(REGISTER_CONSUMER_URL_KEY, false)) {
                 Instance instance = createInstance(url);
 

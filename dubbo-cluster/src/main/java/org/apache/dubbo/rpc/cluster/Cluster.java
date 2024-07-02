@@ -30,6 +30,7 @@ import org.apache.dubbo.rpc.model.ScopeModelUtil;
  * <a href="http://en.wikipedia.org/wiki/Computer_cluster">Cluster</a>
  * <a href="http://en.wikipedia.org/wiki/Fault-tolerant_system">Fault-Tolerant</a>
  *
+ * Cluster 使用 Directory 提供的 Invoker 列表，根据特定的容错策略选择和调用具体的 Invoker。
  */
 @SPI(Cluster.DEFAULT)
 public interface Cluster {

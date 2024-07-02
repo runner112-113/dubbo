@@ -289,6 +289,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
             }
         }
 
+        // Dubbo是支持配置多个配置中心的，为了便于管理，Dubbo提供了CompositeDynamicConfiguration类来聚合多个动态的配置中心，底层采用HashSet存储。
         if (CollectionUtils.isNotEmpty(configCenters)) {
             CompositeDynamicConfiguration compositeDynamicConfiguration = new CompositeDynamicConfiguration();
             for (ConfigCenterConfig configCenter : configCenters) {
@@ -320,7 +321,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
             }
             return;
         }
-
+        // MetadataReportInstance：可与远程元数据服务器通信的MetadataReport实例的Repository
         MetadataReportInstance metadataReportInstance =
                 applicationModel.getBeanFactory().getBean(MetadataReportInstance.class);
         List<MetadataReportConfig> validMetadataReportConfigs = new ArrayList<>(metadataReportConfigs.size());
@@ -763,7 +764,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
         // export MetricsService
         exportMetricsService();
 
-        if (isRegisterConsumerInstance()) {
+        if (isRegisterConsumerInstance()) { // 暴露MetadataService
             exportMetadataService();
             if (hasPreparedApplicationInstance.compareAndSet(false, true)) {
                 // register the local ServiceInstance if required
@@ -851,6 +852,11 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
         return false;
     }
 
+    /**
+     * 聚合之前，需要将ConfigCenterConfig转换成DynamicConfiguration，方法是prepareEnvironment()。
+     * 这里会根据动态中心的URL协议通过SPI机制加载对应的DynamicConfiguration，例如使用Nacos作为配置中心，对应的就是NacosDynamicConfiguration了。
+     * 另外，这里还会直接读取配置中心的内容，并保存到环境对象Environment中。
+     */
     private DynamicConfiguration prepareEnvironment(ConfigCenterConfig configCenter) {
         if (configCenter.isValid()) {
             if (!configCenter.checkOrUpdateInitialized(true)) {
@@ -902,6 +908,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
                     Map<String, String> configMap = parseProperties(configContent);
                     Map<String, String> appConfigMap = parseProperties(appConfigContent);
 
+                    // 内容保存到Environment
                     environment.updateExternalConfigMap(configMap);
                     environment.updateAppExternalConfigMap(appConfigMap);
 

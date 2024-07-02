@@ -49,6 +49,8 @@ public @interface Activate {
      *
      * @return group names to match
      * @see ExtensionLoader#getActivateExtension(URL, String, String)
+     *
+     * 自动激活时匹配的Group
      */
     String[] group() default {};
 
@@ -62,6 +64,8 @@ public @interface Activate {
      * @return URL parameter keys
      * @see ExtensionLoader#getActivateExtension(URL, String)
      * @see ExtensionLoader#getActivateExtension(URL, String, String)
+     *
+     * 自动激活时匹配的Value
      */
     String[] value() default {};
 

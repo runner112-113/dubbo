@@ -188,6 +188,7 @@ public class DefaultModuleDeployer extends AbstractDeployer<ModuleModel> impleme
                 onModuleStarted();
 
                 // register services to registry
+                // 注册服务
                 registerServices();
 
                 // check reference config
@@ -516,10 +517,12 @@ public class DefaultModuleDeployer extends AbstractDeployer<ModuleModel> impleme
     }
 
     private void referServices() {
+        //这个是获取配置的所有的ReferenceConfigBase类型对象
         configManager.getReferences().forEach(rc -> {
             try {
                 ReferenceConfig<?> referenceConfig = (ReferenceConfig<?>) rc;
                 if (!referenceConfig.isRefreshed()) {
+                    // 刷新引用配置
                     referenceConfig.refresh();
                 }
 
@@ -529,6 +532,7 @@ public class DefaultModuleDeployer extends AbstractDeployer<ModuleModel> impleme
                         CompletableFuture<Void> future = CompletableFuture.runAsync(
                                 () -> {
                                     try {
+                                        // 间接的通过缓存对象来引用服务配置
                                         referenceCache.get(rc, false);
                                     } catch (Throwable t) {
                                         logger.error(
@@ -544,6 +548,7 @@ public class DefaultModuleDeployer extends AbstractDeployer<ModuleModel> impleme
 
                         asyncReferringFutures.add(future);
                     } else {
+                        // 间接的通过缓存对象来引用服务配置
                         referenceCache.get(rc, false);
                     }
                 }
@@ -554,6 +559,7 @@ public class DefaultModuleDeployer extends AbstractDeployer<ModuleModel> impleme
                         "",
                         "Model reference failed: " + getIdentifier() + " , catch error : " + t.getMessage(),
                         t);
+                // 出现异常销毁引用配置
                 referenceCache.destroy(rc);
                 throw t;
             }

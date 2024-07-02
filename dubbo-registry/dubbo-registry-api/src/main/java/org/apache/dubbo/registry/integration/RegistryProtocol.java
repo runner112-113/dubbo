@@ -242,8 +242,10 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
 
     @Override
     public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcException {
+        // 注册中心URL
         URL registryUrl = getRegistryUrl(originInvoker);
         // url to export locally
+        // providerUrl才是服务暴露的真实协议地址
         URL providerUrl = getProviderUrl(originInvoker);
 
         // Subscribe the override data
@@ -260,13 +262,17 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
 
         providerUrl = overrideUrlWithConfig(providerUrl, overrideSubscribeListener);
         // export invoker
+        // 根据指定的协议来暴露服务。
         final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker, providerUrl);
 
         // url to registry
+        // SPI加载Registry实现
         final Registry registry = getRegistry(registryUrl);
+        // 注册到注册中心的URL
         final URL registeredProviderUrl = customizeURL(providerUrl, registryUrl);
 
         // decide if we need to delay publish (provider itself and registry should both need to register)
+        // 是否立即注册 service-discovery-registry中的register为false，所以此时不是立即注册
         boolean register = providerUrl.getParameter(REGISTER_KEY, true) && registryUrl.getParameter(REGISTER_KEY, true);
         if (register) {
             register(registry, registeredProviderUrl);
@@ -325,6 +331,7 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
         Invoker<?> invokerDelegate = new InvokerDelegate<>(originInvoker, providerUrl);
 
         ReferenceCountExporter<?> exporter =
+                // // 这里才是真实的 根据URL协议加载Protocol服务暴露
                 exporterFactory.createExporter(providerUrlKey, () -> protocol.export(invokerDelegate));
         return (ExporterChangeableWrapper<T>) bounds.computeIfAbsent(providerUrlKey, k -> new ConcurrentHashMap<>())
                 .computeIfAbsent(
@@ -528,7 +535,10 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
+        // 重写URL，获取注册中心URL
+        // nacos://124.222.122.96:8848/org.apache.dubbo.registry.RegistryService?REGISTRY_CLUSTER=default&application=dubbo-demo-api-consumer&dubbo=2.0.2&executor-management-mode=isolation&file-cache=true&pid=13192&timestamp=1719833428718
         url = getRegistryUrl(url);
+        // 获取用于操作的Registry类型：nacos、zookeeper
         Registry registry = getRegistry(url);
         if (RegistryService.class.equals(type)) {
             return proxyFactory.getInvoker((T) registry, type, url);
@@ -543,7 +553,12 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
             }
         }
 
+        // 降级容错的逻辑处理对象 类型为Cluster 实际类型为MockClusterWrapper 内部包装的是FailoverCluster
+        // 后续调用服务失败时候会先失效转移再降级
+        // SPI加载Cluster ScopeClusterWrapper --> MockClusterWrapper --> FailoverCluster
         Cluster cluster = Cluster.getCluster(url.getScopeModel(), qs.get(CLUSTER_KEY));
+        // 这里才是具体的Invoker对象的创建
+        // 引用服务
         return doRefer(cluster, registry, type, url, qs);
     }
 
@@ -562,7 +577,9 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
                 parameters,
                 consumerAttribute);
         url = url.putAttribute(CONSUMER_URL_KEY, consumerUrl);
+        // 获取带迁移性质的Invoker对象
         ClusterInvoker<T> migrationInvoker = getMigrationInvoker(this, cluster, registry, type, url, consumerUrl);
+        // 这一行回来执行迁移规则创建应用级优先的服务发现Invoker对象
         return interceptInvoker(migrationInvoker, url, consumerUrl);
     }
 
@@ -593,12 +610,14 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
      * @return The @param MigrationInvoker passed in
      */
     protected <T> Invoker<T> interceptInvoker(ClusterInvoker<T> invoker, URL url, URL consumerUrl) {
+        // 获取激活的注册协议监听器扩展里面registry.protocol.listener，这里激活的类型为MigrationRuleListener
         List<RegistryProtocolListener> listeners = findRegistryProtocolListeners(url);
         if (CollectionUtils.isEmpty(listeners)) {
             return invoker;
         }
 
         for (RegistryProtocolListener listener : listeners) {
+            // 这里触发MigrationRuleListener类型的onRefer方法
             listener.onRefer(this, invoker, consumerUrl, url);
         }
         return invoker;
@@ -633,11 +652,15 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
         urlToRegistry = urlToRegistry.setServiceModel(directory.getConsumerUrl().getServiceModel());
         if (directory.isShouldRegister()) {
             directory.setRegisteredConsumerUrl(urlToRegistry);
+            // 注册Consumer
             registry.register(directory.getRegisteredConsumerUrl());
         }
+        // 构建RouterChain，每个Directory都有一条Router路由链，Dubbo的路由机制可以根据路由规则对Provider进行筛选
         directory.buildRouterChain(urlToRegistry);
+        // 订阅服务，服务变更时触发notify()
         directory.subscribe(toSubscribeUrl(urlToRegistry));
 
+        // 创建Invoker对象
         return (ClusterInvoker<T>) cluster.join(directory, true);
     }
 

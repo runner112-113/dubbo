@@ -24,6 +24,8 @@ import org.apache.dubbo.rpc.cluster.support.wrapper.AbstractCluster;
  * {@link FailoverClusterInvoker}
  *
  * 失败自动切换，当出现失败，重试其它服务器。通常用于读操作，但重试会带来更长延迟。可通过 retries="2" 来设置重试次数(不含第一次)。
+ *
+ * FailoverCluster 是一种常见的 Cluster 实现，它在调用失败时，会自动切换到其他可用的 Invoker 并重试，直到达到最大重试次数。
  */
 public class FailoverCluster extends AbstractCluster {
 

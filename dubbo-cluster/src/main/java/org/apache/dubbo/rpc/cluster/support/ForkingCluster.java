@@ -24,6 +24,8 @@ import org.apache.dubbo.rpc.cluster.support.wrapper.AbstractCluster;
  * {@link ForkingClusterInvoker}
  *
  * 并行调用多个服务器，只要一个成功即返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 forks="2" 来设置最大并行数。
+ *
+ * ForkingCluster：并行调用多个服务提供者，只要有一个成功即返回。
  */
 public class ForkingCluster extends AbstractCluster {
 

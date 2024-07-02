@@ -37,6 +37,9 @@ import static org.apache.dubbo.common.constants.RegistryConstants.REGISTRY_KEY;
 
 /**
  * StaticDirectory
+ *
+ * 用于点对点直连时已经明确Provider的场景
+ * 点对点配置多个路径就有多个
  */
 public class StaticDirectory<T> extends AbstractDirectory<T> {
     private static final ErrorTypeAwareLogger logger = LoggerFactory.getErrorTypeAwareLogger(StaticDirectory.class);

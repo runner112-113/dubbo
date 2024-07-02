@@ -23,6 +23,8 @@ import org.apache.dubbo.rpc.cluster.support.wrapper.AbstractCluster;
 /**
  * {@link FailfastClusterInvoker}
  *  快速失败，只发起一次调用，失败立即报错。通常用于非幂等性的写操作，比如新增记录
+ *
+ *  FailfastCluster：快速失败，在调用失败时立即抛出异常，不进行重试。
  */
 public class FailfastCluster extends AbstractCluster {
 

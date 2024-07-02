@@ -694,6 +694,12 @@ public abstract class AbstractConfig implements Serializable {
 
     /**
      * Dubbo config property override
+     *
+     * Dubbo提供了多种配置方式，例如：dubbo.properties、环境变量、JVM参数等，这些配置的优先级都是不一样的，同样的配置在多个地方出现，是会按照优先级进行覆盖的，refresh()方法就实现了这一块的逻辑
+     *
+     * refreshWithPrefixes：
+     * refresh()方法会通过反射获取ConfigClass的所有方法，然后判断这些方法是否是属性的Setter方法，如果是就会通过反射进行赋值，
+     * 值从哪里来呢？这就要回到Dubbo的环境对象Environment了。Environment对象保存了Dubbo所有形式的配置
      */
     public void refresh() {
         if (needRefresh) {
@@ -751,6 +757,7 @@ public abstract class AbstractConfig implements Serializable {
                     + subProperties);
         }
 
+        // 赋值
         assignProperties(this, environment, subProperties, subPropsConfiguration, configMode);
 
         // process extra refresh of subclass, e.g. refresh method configs

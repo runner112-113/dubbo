@@ -27,6 +27,7 @@ import org.apache.dubbo.demo.DemoService;
 public class Application {
 
     private static final String REGISTRY_URL = "zookeeper://127.0.0.1:2181";
+    private static final String REGISTRY_NACOS_URL = "nacos://124.222.122.96:8848";
 
     public static void main(String[] args) {
         startWithBootstrap();
@@ -40,7 +41,7 @@ public class Application {
         DubboBootstrap bootstrap = DubboBootstrap.getInstance();
         bootstrap
                 .application(new ApplicationConfig("dubbo-demo-api-provider"))
-                .registry(new RegistryConfig(REGISTRY_URL))
+                .registry(new RegistryConfig(REGISTRY_NACOS_URL))
                 .protocol(new ProtocolConfig(CommonConstants.DUBBO, -1))
                 .service(service)
                 .start()

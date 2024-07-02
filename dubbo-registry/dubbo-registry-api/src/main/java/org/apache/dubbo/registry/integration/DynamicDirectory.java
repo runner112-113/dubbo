@@ -59,6 +59,8 @@ import static org.apache.dubbo.remoting.Constants.CHECK_KEY;
 
 /**
  * DynamicDirectory
+ *
+ * 基于注册中心的，适用于Provider不断变化的场景
  */
 public abstract class DynamicDirectory<T> extends AbstractDirectory<T> implements NotifyListener {
 
@@ -181,6 +183,9 @@ public abstract class DynamicDirectory<T> extends AbstractDirectory<T> implement
         return shouldRegister;
     }
 
+    /**
+     * subscribe()方法会订阅服务，当Provider服务发生变更时会收到通知，触发notify()方法，notify()方法里会将ProviderUrls转换成对应的Invoker，这个待会细说。
+     */
     public void subscribe(URL url) {
         setSubscribeUrl(url);
         registry.subscribe(url, this);
@@ -287,6 +292,9 @@ public abstract class DynamicDirectory<T> extends AbstractDirectory<T> implement
         }
     }
 
+    /**
+     * buildRouterChain()方法用于构建RouterChain，每个Directory都有一条Router路由链，Dubbo的路由机制可以根据路由规则对Provider进行筛选
+     */
     public void buildRouterChain(URL url) {
         this.setRouterChain(RouterChain.buildChain(getInterface(), url));
     }

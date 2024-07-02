@@ -338,6 +338,7 @@ public class DubboProtocol extends AbstractProtocol {
         URL url = invoker.getUrl();
 
         // export service.
+        // 生成服务唯一标识
         String key = serviceKey(url);
         DubboExporter<T> exporter = new DubboExporter<>(invoker, key, exporterMap);
 
@@ -358,7 +359,9 @@ public class DubboProtocol extends AbstractProtocol {
             }
         }
 
+        // 开启服务
         openServer(url);
+        // 优化序列化效率
         optimizeSerialization(url);
 
         return exporter;
@@ -413,6 +416,7 @@ public class DubboProtocol extends AbstractProtocol {
 
         ExchangeServer server;
         try {
+            // Exchanger实现类会通过SPI自适应加载，目前只有一种实现类HeaderExchanger。
             server = Exchangers.bind(url, requestHandler);
         } catch (RemotingException e) {
             throw new RpcException("Fail to start server(url: " + url + ") " + e.getMessage(), e);
@@ -449,10 +453,17 @@ public class DubboProtocol extends AbstractProtocol {
         return invoker;
     }
 
+    /**
+     * getClients()方法会获取客户端ExchangeClient对象，和服务端建立连接。
+     * 可以看到它是一个数组，这意味着Consumer可以跟同一个Provider同时建立多个连接，通过参数connections进行配置。默认情况下，该值为0，Consumer只会建立一条连接，所有人都共用这条连接。
+     * 一般不建议修改该值，除非是一对一压测时，可以通过调大它来增强网络传输的能力。
+     *
+     */
     private ClientsProvider getClients(URL url) {
         int connections = url.getParameter(CONNECTIONS_KEY, 0);
         // whether to share connection
         // if not configured, connection is shared, otherwise, one connection for one service
+        // 使用共享连接
         if (connections == 0) {
             /*
              * The xml configuration should have a higher priority than properties.

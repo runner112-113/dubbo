@@ -575,7 +575,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
         providerModel.setDestroyRunner(getDestroyRunner());
         repository.registerProvider(providerModel);
-
+        // 1. service-discovery-registry://124.222.122.96:8848/org.apache.dubbo.registry.RegistryService?REGISTRY_CLUSTER=default&application=dubbo-demo-api-provider&dubbo=2.0.2&executor-management-mode=isolation&file-cache=true&pid=16940&registry=nacos&timestamp=1719799009495
+        // 2. registry://124.222.122.96:8848/org.apache.dubbo.registry.RegistryService?REGISTRY_CLUSTER=default&application=dubbo-demo-api-provider&dubbo=2.0.2&executor-management-mode=isolation&file-cache=true&pid=16940&registry=nacos&timestamp=1719799009495
         List<URL> registryURLs = ConfigValidationUtils.loadRegistries(this, true);
 
         for (ProtocolConfig protocolConfig : protocols) {
@@ -864,6 +865,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
                 url = exportRemote(url, registryURLs, registerType);
                 if (!isGeneric(generic) && !getScopeModel().isInternal()) {
+                    // 注册元信息
                     MetadataUtils.publishServiceDefinition(url, providerModel.getServiceModel(), getApplicationModel());
                 }
 
@@ -947,7 +949,10 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 || registerType == RegisterTypeEnum.AUTO_REGISTER_BY_DEPLOYER) {
             url = url.addParameter(REGISTER_KEY, false);
         }
-
+        // 通过动态代理生产ref调用的Wrapper对象
+        // 先将ref包装成Invoker，对应的方法是ProxyFactory#getInvoker()，Invoker会根据methodName调用ref的方法。
+        //有两种方式，一种是利用Java自带的反射，另一种是利用字节码技术动态生成代理对象。
+        // Dubbo默认会选择第二种方式，利用javassist动态创建Class对应的Wrapper对象，动态生成的Wrapper类会根据方法名和参数直接调用ref对应的方法，避免Java反射带来的性能问题。
         Invoker<?> invoker = proxyFactory.getInvoker(ref, (Class) interfaceClass, url);
         if (withMetaData) {
             invoker = new DelegateProviderMetaDataInvoker(invoker, this);

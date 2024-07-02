@@ -51,6 +51,8 @@ public class HeaderExchanger implements Exchanger {
             server = new HeaderExchangeServer(
                     PortUnificationExchanger.bind(url, new DecodeHandler(new HeaderExchangeHandler(handler))));
         } else {
+            // Transporter是Dubbo对网络传输层的抽象接口，默认使用Netty，其他还有如Mina、Grizzly等，
+            // Transporter实现也是通过SPI自适应加载的，可以通过参数server或transporter指定
             server = new HeaderExchangeServer(
                     Transporters.bind(url, new DecodeHandler(new HeaderExchangeHandler(handler))));
         }

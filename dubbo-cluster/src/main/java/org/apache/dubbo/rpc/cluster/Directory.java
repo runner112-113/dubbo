@@ -31,6 +31,8 @@ import java.util.List;
  * <a href="http://en.wikipedia.org/wiki/Directory_service">Directory Service</a>
  *
  * @see org.apache.dubbo.rpc.cluster.Cluster#join(Directory)
+ *
+ * Directory 管理了服务提供者的集合，并负责提供当前可用的 Invoker 列表
  */
 public interface Directory<T> extends Node {
 

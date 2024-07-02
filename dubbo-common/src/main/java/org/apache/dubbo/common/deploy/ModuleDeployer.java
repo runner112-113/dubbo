@@ -23,6 +23,8 @@ import java.util.concurrent.Future;
 
 /**
  * Export/refer services of module
+ *
+ * 负责模块的部署和生命周期管理，确保模块按正确的顺序启动和停止
  */
 public interface ModuleDeployer extends Deployer<ModuleModel> {
 

@@ -113,15 +113,21 @@ public class SimpleReferenceCache implements ReferenceCache {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(ReferenceConfigBase<T> rc, boolean check) {
+        //这个生成的key规则是这样的 服务分组/服务接口:版本号
+        //例如： group/link.elastic.dubbo.entity.DemoService:1.0
         String key = generator.generateKey(rc);
+        //服务类型 如果是泛化调用则这个类型为GenericService
         Class<?> type = rc.getInterfaceClass();
 
+        //服务是否为单例的这里默认值都为空，为单例模式
         boolean singleton = rc.getSingleton() == null || rc.getSingleton();
         T proxy = null;
         // Check existing proxy of the same 'key' and 'type' first.
         if (singleton) {
+            //一般为单例的 这个方法是从缓存中获取
             proxy = get(key, (Class<T>) type);
         } else {
+            //非单例容易造成内存泄露，无法从缓存中获取
             logger.warn(
                     CONFIG_API_WRONG_USE,
                     "",
@@ -130,13 +136,20 @@ public class SimpleReferenceCache implements ReferenceCache {
                             + "Call ReferenceConfig#get() directly for non-singleton ReferenceConfig instead of using ReferenceCache#get(ReferenceConfig)");
         }
 
+        //前面是从缓存中拿，如果缓存中获取不到则开始引用服务
         if (proxy == null) {
+            //获取或者创建值，为引用类型referencesOfType对象（类型为Map<Class<?>, List<ReferenceConfigBase<?>>>）缓存对象生成值（值不存在时候会生成一个）
             List<ReferenceConfigBase<?>> referencesOfType = ConcurrentHashMapUtils.computeIfAbsent(
                     referenceTypeMap, type, _t -> Collections.synchronizedList(new ArrayList<>()));
+            //每次走到这里都会添加一个ReferenceConfigBase 引用配置对象（单例的从缓存中拿到就可以直接返回了）
             referencesOfType.add(rc);
+
+            //与前面一样 前面是类型映射，这里是key映射
             List<ReferenceConfigBase<?>> referenceConfigList = ConcurrentHashMapUtils.computeIfAbsent(
                     referenceKeyMap, key, _k -> Collections.synchronizedList(new ArrayList<>()));
+            // 加入缓存
             referenceConfigList.add(rc);
+            //开始引用服务
             proxy = rc.get(check);
         }
 

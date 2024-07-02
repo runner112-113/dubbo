@@ -57,7 +57,7 @@ public abstract class AbstractCluster implements Cluster {
     @Override
     public <T> Invoker<T> join(Directory<T> directory, boolean buildFilterChain) throws RpcException {
         if (buildFilterChain) {
-            return buildClusterInterceptors(doJoin(directory));
+            return buildClusterInterceptors(doJoin(directory)); // doJoin构建具体的ClusterInvoker
         } else {
             return doJoin(directory);
         }

@@ -63,7 +63,7 @@ public abstract class AbstractClusterInvoker<T> implements ClusterInvoker<T> {
 
     private static final ErrorTypeAwareLogger logger =
             LoggerFactory.getErrorTypeAwareLogger(AbstractClusterInvoker.class);
-
+    // 有所提供者的集合 ---> 目录
     protected Directory<T> directory;
 
     protected boolean availableCheck;
@@ -352,11 +352,13 @@ public abstract class AbstractClusterInvoker<T> implements ClusterInvoker<T> {
         //        }
 
         InvocationProfilerUtils.enterDetailProfiler(invocation, () -> "Router route.");
+        // 通过Directory过滤服务列表
         List<Invoker<T>> invokers = list(invocation);
         InvocationProfilerUtils.releaseDetailProfiler(invocation);
 
         checkInvokers(invokers, invocation);
 
+        // 初始化 负载均衡
         LoadBalance loadbalance = initLoadBalance(invokers, invocation);
         RpcUtils.attachInvocationIdIfAsync(getUrl(), invocation);
 
