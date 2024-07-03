@@ -274,6 +274,21 @@ public class DubboCodec extends ExchangeCodec {
         encodeResponseData(channel, out, data, DUBBO_VERSION);
     }
 
+    /**
+     * Dubbo并不会将整个RpcInvocation对象序列化输出，而是按照固定的格式，将重要信息写入到ObjectOutput。
+     * 格式如下：
+     *
+     * 1. 协议Version
+     * 2. ServiceName
+     * 3. ServiceVersion
+     * 4. MethodName
+     * 5. ParameterTypesDesc
+     * 6. Arguments序列化
+     * 7. Attachments序列化
+     *
+     * Provider按照约定的格式，依次将这些数据再读取出来即可。
+     *
+     */
     @Override
     protected void encodeRequestData(Channel channel, ObjectOutput out, Object data, String version)
             throws IOException {

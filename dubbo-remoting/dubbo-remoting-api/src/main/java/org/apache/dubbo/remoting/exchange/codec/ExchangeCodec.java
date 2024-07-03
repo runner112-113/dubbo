@@ -255,12 +255,12 @@ public class ExchangeCodec extends TelnetCodec {
     }
 
     protected void encodeRequest(Channel channel, ChannelBuffer buffer, Request req) throws IOException {
+        // 序列化策略 默认hessian2
         Serialization serialization = getSerialization(channel, req);
-        // header.
+        // header. header总长 16bytes
         byte[] header = new byte[HEADER_LENGTH];
-        // set magic number.
+        // set magic number. 2byte 魔数
         Bytes.short2bytes(MAGIC, header);
-
         // set request and serialization flag.
         header[2] = (byte) (FLAG_REQUEST | serialization.getContentTypeId());
 
@@ -272,11 +272,13 @@ public class ExchangeCodec extends TelnetCodec {
         }
 
         // set request id.
+        // RequestId 全局自增
         Bytes.long2bytes(req.getId(), header, 4);
 
         // encode request data.
         int savedWriteIndex = buffer.writerIndex();
         buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);
+        // 序列化Data
         ChannelBufferOutputStream bos = new ChannelBufferOutputStream(buffer);
 
         if (req.isHeartbeat()) {
@@ -298,6 +300,7 @@ public class ExchangeCodec extends TelnetCodec {
         bos.flush();
         bos.close();
         int len = bos.writtenBytes();
+        // 校验负载，Body是否太大
         checkPayload(channel, req.getPayload(), len);
         Bytes.int2bytes(len, header, 12);
 
