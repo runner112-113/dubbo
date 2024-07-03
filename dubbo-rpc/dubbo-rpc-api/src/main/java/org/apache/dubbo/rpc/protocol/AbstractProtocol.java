@@ -57,6 +57,9 @@ public abstract class AbstractProtocol implements Protocol, ScopeModelAware {
 
     protected final ErrorTypeAwareLogger logger = LoggerFactory.getErrorTypeAwareLogger(getClass());
 
+    /**
+     * <serviceKey, Exporter> 最终会在此处根据serviceKey --> Exporter --> Invoker
+     */
     protected final Map<String, Exporter<?>> exporterMap = new ConcurrentHashMap<>();
 
     /**

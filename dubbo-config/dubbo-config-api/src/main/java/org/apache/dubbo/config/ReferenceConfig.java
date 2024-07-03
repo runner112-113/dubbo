@@ -864,6 +864,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         boolean isJvmRefer;
         if (isInjvm() == null) {
             // if an url is specified, don't do local reference
+            // 点对点调用的url不为空
             if (StringUtils.isNotEmpty(url)) {
                 isJvmRefer = false;
             } else {

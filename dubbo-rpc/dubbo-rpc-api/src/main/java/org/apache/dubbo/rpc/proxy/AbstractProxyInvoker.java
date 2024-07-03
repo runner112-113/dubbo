@@ -96,7 +96,7 @@ public abstract class AbstractProxyInvoker<T> implements Invoker<T> {
                     originEntry = Profiler.setToBizProfiler(profiler);
                 }
             }
-
+            // 开始执行
             Object value = doInvoke(
                     proxy, invocation.getMethodName(), invocation.getParameterTypes(), invocation.getArguments());
 

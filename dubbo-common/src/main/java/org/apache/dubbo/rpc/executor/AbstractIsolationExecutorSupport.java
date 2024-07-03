@@ -38,7 +38,7 @@ public abstract class AbstractIsolationExecutorSupport implements ExecutorSuppor
 
     @Override
     public Executor getExecutor(Object data) {
-
+        // 拿到ProviderModel
         ProviderModel providerModel = getProviderModel(data);
         if (providerModel == null) {
             return executorRepository.getExecutor(url);
@@ -66,6 +66,7 @@ public abstract class AbstractIsolationExecutorSupport implements ExecutorSuppor
         if (serviceKey == null) {
             return null;
         }
+        // 从frameworkServiceRepository中拿到指定serviceKey的ProviderModel
         return frameworkServiceRepository.lookupExportedService(serviceKey.toString());
     }
 }

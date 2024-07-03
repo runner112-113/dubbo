@@ -951,7 +951,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         }
         // 通过动态代理生产ref调用的Wrapper对象
         // 先将ref包装成Invoker，对应的方法是ProxyFactory#getInvoker()，Invoker会根据methodName调用ref的方法。
-        //有两种方式，一种是利用Java自带的反射，另一种是利用字节码技术动态生成代理对象。
+        // 有两种方式，一种是利用Java自带的反射，另一种是利用字节码技术动态生成代理对象。
         // Dubbo默认会选择第二种方式，利用javassist动态创建Class对应的Wrapper对象，动态生成的Wrapper类会根据方法名和参数直接调用ref对应的方法，避免Java反射带来的性能问题。
         Invoker<?> invoker = proxyFactory.getInvoker(ref, (Class) interfaceClass, url);
         if (withMetaData) {

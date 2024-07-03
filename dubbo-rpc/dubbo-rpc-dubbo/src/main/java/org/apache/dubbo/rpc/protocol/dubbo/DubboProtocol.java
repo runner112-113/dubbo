@@ -128,6 +128,7 @@ public class DubboProtocol extends AbstractProtocol {
                 }
 
                 Invocation inv = (Invocation) message;
+                // 拿到Invoker 没有传递过来就从DubboExporter中获取
                 Invoker<?> invoker = inv.getInvoker() == null ? getInvoker(channel, inv) : inv.getInvoker();
                 // switch TCCL
                 if (invoker.getUrl().getServiceModel() != null) {
@@ -338,8 +339,9 @@ public class DubboProtocol extends AbstractProtocol {
         URL url = invoker.getUrl();
 
         // export service.
-        // 生成服务唯一标识
+        // 生成服务唯一标识: group/path:version:port
         String key = serviceKey(url);
+        // 此处添加到AbstractProtocol.exporterMap中
         DubboExporter<T> exporter = new DubboExporter<>(invoker, key, exporterMap);
 
         // export a stub service for dispatching event

@@ -66,6 +66,7 @@ public @interface Activate {
      * @see ExtensionLoader#getActivateExtension(URL, String, String)
      *
      * 自动激活时匹配的Value
+     * value不设置时 只依赖于group
      */
     String[] value() default {};
 

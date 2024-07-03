@@ -30,6 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 元信息注册远程通信的类
+ * {@link   NacosMetadataReport}
+ */
 public interface MetadataReport {
     /**
      * Service Definition -- START

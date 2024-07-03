@@ -41,7 +41,9 @@ public class Application {
     private static void runWithBootstrap() {
         ReferenceConfig<DemoService> reference = new ReferenceConfig<>();
         reference.setInterface(DemoService.class);
-        reference.setGeneric("true");
+        reference.setGroup("dev");
+        reference.setVersion("1.1.1");
+//        reference.setGeneric("true");
 
         DubboBootstrap bootstrap = DubboBootstrap.getInstance();
         bootstrap

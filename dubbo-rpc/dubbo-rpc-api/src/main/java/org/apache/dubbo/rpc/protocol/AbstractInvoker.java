@@ -188,9 +188,11 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
         prepareInvocation(invocation);
 
         // do invoke rpc invocation and return async result
+        // 真正的网络调用
         AsyncRpcResult asyncResult = doInvokeAndReturn(invocation);
 
         // wait rpc result if sync
+        // 同步调用 在此get(timeout)
         waitForResultIfSync(asyncResult, invocation);
 
         return asyncResult;
@@ -199,12 +201,16 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
     private void prepareInvocation(RpcInvocation inv) {
         inv.setInvoker(this);
 
+        // 添加 attachments
         addInvocationAttachments(inv);
 
+        // 设置invoke-mode：Future，Async,Sync
         inv.setInvokeMode(RpcUtils.getInvokeMode(url, inv));
 
+        // 异步的 设置request-id
         RpcUtils.attachInvocationIdIfAsync(getUrl(), inv);
 
+        // 设置serialization_id
         attachInvocationSerializationId(inv);
     }
 

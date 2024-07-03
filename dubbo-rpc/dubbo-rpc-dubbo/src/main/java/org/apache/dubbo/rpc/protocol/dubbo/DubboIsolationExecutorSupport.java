@@ -52,7 +52,7 @@ public class DubboIsolationExecutorSupport extends AbstractIsolationExecutorSupp
             return null;
         }
 
-        try {
+        try { // 赋值上invoker
             ((DecodeableRpcInvocation) request.getData()).fillInvoker(dubboProtocol);
         } catch (RemotingException e) {
             // ignore here, and this exception will being rethrow in DubboProtocol
