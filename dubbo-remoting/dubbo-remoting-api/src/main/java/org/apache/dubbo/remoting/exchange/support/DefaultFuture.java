@@ -58,6 +58,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
 
     /**
      * in-flight requests
+     * 所有fly的请求
      */
     private static final Map<Long, DefaultFuture> FUTURES = new ConcurrentHashMap<>();
 

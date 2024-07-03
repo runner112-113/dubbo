@@ -341,6 +341,13 @@ public abstract class AbstractClusterInvoker<T> implements ClusterInvoker<T> {
         }
     }
 
+    /**
+     * 模版方法：
+     * 1. 通过Directory过滤可调用的服务列表得到一组Invoker，
+     * 2. 再初试化LoadBalance，
+     * 3. 后续负载均衡将在这一组Invoker里面选出一个最终的Invoker进行调用。
+     *
+     */
     @Override
     public Result invoke(final Invocation invocation) throws RpcException {
         checkWhetherDestroyed();

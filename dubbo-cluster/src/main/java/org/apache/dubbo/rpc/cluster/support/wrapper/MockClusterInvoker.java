@@ -44,6 +44,12 @@ import static org.apache.dubbo.rpc.Constants.MOCK_KEY;
 import static org.apache.dubbo.rpc.cluster.Constants.FORCE_KEY;
 import static org.apache.dubbo.rpc.cluster.Constants.INVOCATION_NEED_MOCK;
 
+/**
+ * 该类的职责是服务降级、数据Mock。当接口调用失败时，Dubbo会尝试Mock数据并返回，适用于非关键流程。
+ * 需要注意的是，对于业务异常，Dubbo是不会Mock的，只针对非业务异常，例如超时。
+ * 具体实现就是对invoke逻辑进行try catch，如果捕获到非业务异常，则执行Mock逻辑，返回Mock数据
+ *
+ */
 public class MockClusterInvoker<T> implements ClusterInvoker<T> {
 
     private static final ErrorTypeAwareLogger logger = LoggerFactory.getErrorTypeAwareLogger(MockClusterInvoker.class);

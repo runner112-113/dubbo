@@ -42,6 +42,12 @@ import static org.apache.dubbo.common.constants.LoggerCodeConstants.TRANSPORT_FA
 /**
  * ExchangeReceiver
  */
+
+/**
+ * 该类的职责是负责发送网络请求，Dubbo所有的网络请求最终都会封装为Request对象，它记录了RequestID，协议版本，请求体等信息。
+ * 它底层又会依赖Channel，这就涉及到网络传输层了，以Netty为例，最终会调用channel.writeAndFlush()将数据发送到对端。
+ *
+ */
 final class HeaderExchangeChannel implements ExchangeChannel {
 
     private static final ErrorTypeAwareLogger logger =

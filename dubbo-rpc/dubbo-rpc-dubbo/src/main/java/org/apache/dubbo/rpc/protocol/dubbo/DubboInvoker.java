@@ -58,6 +58,8 @@ import static org.apache.dubbo.rpc.Constants.TOKEN_KEY;
 
 /**
  * DubboInvoker
+ *
+ * 该类的职责是实现dubbo协议的远程调用，它是底层的Invoker，没有再包装其它Invoker了
  */
 public class DubboInvoker<T> extends AbstractInvoker<T> {
 
@@ -85,6 +87,11 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
         this.serverShutdownTimeout = ConfigurationUtils.getServerShutdownTimeout(getUrl().getScopeModel());
     }
 
+    /**
+     * 利用ExchangeClient将RpcInvocation作为参数发送到Provider，
+     * 得到CompletableFuture结果，将其包装为AsyncRpcResult并返回。
+     *
+     */
     @Override
     protected Result doInvoke(final Invocation invocation) throws Throwable {
         RpcInvocation inv = (RpcInvocation) invocation;
@@ -93,6 +100,7 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
         inv.setAttachment(PATH_KEY, getUrl().getPath());
         inv.setAttachment(VERSION_KEY, version);
 
+        // 轮询客户端
         ExchangeClient currentClient;
         List<? extends ExchangeClient> exchangeClients = clientsProvider.getClients();
         if (exchangeClients.size() == 1) {
@@ -102,8 +110,10 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
         }
         RpcContext.getServiceContext().setLocalAddress(currentClient.getLocalAddress());
         try {
+            // 是否单向发送，不期望对端响应数据
             boolean isOneway = RpcUtils.isOneway(getUrl(), invocation);
 
+            // 计算超时
             int timeout = RpcUtils.calculateTimeout(getUrl(), invocation, methodName, DEFAULT_TIMEOUT);
             if (timeout <= 0) {
                 return AsyncRpcResult.newDefaultAsyncResult(
@@ -132,7 +142,9 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
                 return AsyncRpcResult.newDefaultAsyncResult(invocation);
             } else {
                 request.setTwoWay(true);
+                // 回调线程池
                 ExecutorService executor = getCallbackExecutor(getUrl(), inv);
+                // 发送请求
                 CompletableFuture<AppResponse> appResponseFuture =
                         currentClient.request(request, timeout, executor).thenApply(AppResponse.class::cast);
                 // save for 2.6.x compatibility, for example, TraceFilter in Zipkin uses com.alibaba.xxx.FutureAdapter
