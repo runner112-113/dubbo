@@ -86,6 +86,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
     }
 
     void handleRequest(final ExchangeChannel channel, Request req) throws RemotingException {
+        // 构建响应
         Response res = new Response(req.getId(), req.getVersion());
         if (req.isBroken()) {
             Object data = req.getData();
@@ -107,6 +108,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
         // find handler by message class.
         Object msg = req.getData();
         try {
+            // 最终处理
             CompletionStage<Object> future = handler.reply(channel, msg);
             future.whenComplete((appResult, t) -> {
                 try {
@@ -117,6 +119,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
                         res.setStatus(Response.SERVICE_ERROR);
                         res.setErrorMessage(StringUtils.toString(t));
                     }
+                    // 响应结果
                     channel.send(res);
                 } catch (RemotingException e) {
                     logger.warn(

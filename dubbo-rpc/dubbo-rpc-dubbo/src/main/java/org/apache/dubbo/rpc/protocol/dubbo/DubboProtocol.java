@@ -462,6 +462,7 @@ public class DubboProtocol extends AbstractProtocol {
      *
      */
     private ClientsProvider getClients(URL url) {
+        // 连接数=0代表使用共享连接，否则创建独占连接
         int connections = url.getParameter(CONNECTIONS_KEY, 0);
         // whether to share connection
         // if not configured, connection is shared, otherwise, one connection for one service
@@ -470,6 +471,7 @@ public class DubboProtocol extends AbstractProtocol {
             /*
              * The xml configuration should have a higher priority than properties.
              */
+            // 使用共享连接，针对同一个address，会共享同一批Client
             String shareConnectionsStr = StringUtils.isBlank(url.getParameter(SHARE_CONNECTIONS_KEY, (String) null))
                     ? ConfigurationUtils.getProperty(
                             url.getOrDefaultApplicationModel(), SHARE_CONNECTIONS_KEY, DEFAULT_SHARE_CONNECTIONS)

@@ -98,10 +98,13 @@ public final class NettyCodecAdapter {
             NettyChannel channel = NettyChannel.getOrAddChannel(ctx.channel(), url, handler);
 
             // decode object.
+            // 循环读，可能有多条消息
             do {
+                // 先保存读索引
                 int saveReaderIndex = message.readerIndex();
                 Object msg = codec.decode(channel, message);
                 if (msg == Codec2.DecodeResult.NEED_MORE_INPUT) {
+                    // 读到的数据不完整，恢复读索引，等待对端发送更多的数据
                     message.readerIndex(saveReaderIndex);
                     break;
                 } else {

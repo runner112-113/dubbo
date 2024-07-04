@@ -54,10 +54,12 @@ public final class DubboCountCodec implements Codec2 {
     @Override
     public Object decode(Channel channel, ChannelBuffer buffer) throws IOException {
         int save = buffer.readerIndex();
+        // 由于网络问题，可能会接收到多条消息
         MultiMessage result = MultiMessage.create();
         do {
             Object obj = codec.decode(channel, buffer);
             if (Codec2.DecodeResult.NEED_MORE_INPUT == obj) {
+                // 读到的数据不完整，需要对端发送更多的数据
                 buffer.readerIndex(save);
                 break;
             } else {

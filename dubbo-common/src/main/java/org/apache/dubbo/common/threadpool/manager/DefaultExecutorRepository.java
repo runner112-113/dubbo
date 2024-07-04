@@ -72,6 +72,11 @@ public class DefaultExecutorRepository implements ExecutorRepository, ExtensionA
 
     private volatile ExecutorService serviceReferExecutor;
 
+    /**
+     * 创建的线程池会缓存到Map容器中，采用双层嵌套Map结构，
+     * 外层Key代表线程池服务于Consumer还是Provider，因为一个应用可能即使服务提供者也是消费者；
+     * 内层Key是端口Port，同一个端口暴露的服务共用一个线程池。
+     */
     private final ConcurrentMap<String, ConcurrentMap<String, ExecutorService>> data = new ConcurrentHashMap<>();
 
     private final Object LOCK = new Object();
@@ -98,6 +103,7 @@ public class DefaultExecutorRepository implements ExecutorRepository, ExtensionA
      */
     @Override
     public synchronized ExecutorService createExecutorIfAbsent(URL url) {
+        // 区分消费端 生产端
         String executorKey = getExecutorKey(url);
         ConcurrentMap<String, ExecutorService> executors =
                 ConcurrentHashMapUtils.computeIfAbsent(data, executorKey, k -> new ConcurrentHashMap<>());
@@ -107,6 +113,7 @@ public class DefaultExecutorRepository implements ExecutorRepository, ExtensionA
         url = setThreadNameIfAbsent(url, executorCacheKey);
 
         URL finalUrl = url;
+        // 创建线程池：Dubbo目前提供了四种线程池，Provider默认fixed，Consumer默认cached
         ExecutorService executor =
                 ConcurrentHashMapUtils.computeIfAbsent(executors, executorCacheKey, k -> createExecutor(finalUrl));
         // If executor has been shut down, create a new one

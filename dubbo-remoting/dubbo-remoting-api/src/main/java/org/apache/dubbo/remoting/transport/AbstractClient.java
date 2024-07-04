@@ -76,11 +76,13 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
 
         frameworkModel = url.getOrDefaultFrameworkModel();
 
+        // 初始化业务线程池，默认使用cached线程池
         initExecutor(url);
 
         reconnectDuaration = getReconnectDuration(url);
 
         try {
+            // 创建Bootstrap
             doOpen();
         } catch (Throwable t) {
             close();
@@ -94,6 +96,7 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
 
         try {
             // connect.
+            // 连接到远程
             connect();
             if (logger.isInfoEnabled()) {
                 logger.info("Start " + getClass().getSimpleName() + " " + NetUtils.getLocalAddress()

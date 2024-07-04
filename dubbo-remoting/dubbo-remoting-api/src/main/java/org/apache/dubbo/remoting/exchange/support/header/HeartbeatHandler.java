@@ -30,6 +30,10 @@ import org.apache.dubbo.remoting.transport.AbstractChannelHandlerDelegate;
 
 import static org.apache.dubbo.common.constants.CommonConstants.HEARTBEAT_EVENT;
 
+/**
+ * 该Handler专门用来处理心跳的。如果是心跳请求/响应，该类会直接处理掉，不走后续流程了。
+ * 如果是RPC调用请求，交给下一个Handler处理。
+ */
 public class HeartbeatHandler extends AbstractChannelHandlerDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(HeartbeatHandler.class);
@@ -65,13 +69,16 @@ public class HeartbeatHandler extends AbstractChannelHandlerDelegate {
     @Override
     public void received(Channel channel, Object message) throws RemotingException {
         setReadTimestamp(channel);
+        // 心跳请求
         if (isHeartbeatRequest(message)) {
             HeartBeatRequest req = (HeartBeatRequest) message;
+            // 期望得到回复
             if (req.isTwoWay()) {
                 HeartBeatResponse res;
                 res = new HeartBeatResponse(req.getId(), req.getVersion());
                 res.setEvent(HEARTBEAT_EVENT);
                 res.setProto(req.getProto());
+                // 直接构建Response发送
                 channel.send(res);
                 if (logger.isDebugEnabled()) {
                     int heartbeat = channel.getUrl().getParameter(Constants.HEARTBEAT_KEY, 0);
@@ -82,6 +89,7 @@ public class HeartbeatHandler extends AbstractChannelHandlerDelegate {
             }
             return;
         }
+        // 心跳响应
         if (isHeartbeatResponse(message)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Receive heartbeat response in thread "

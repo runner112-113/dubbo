@@ -86,7 +86,9 @@ public class ExchangeCodec extends TelnetCodec {
 
     @Override
     public Object decode(Channel channel, ChannelBuffer buffer) throws IOException {
+        // 可读字节数
         int readable = buffer.readableBytes();
+        // header可能不完整
         byte[] header = new byte[Math.min(readable, HEADER_LENGTH)];
         buffer.readBytes(header);
         return decode(channel, buffer, readable, header);
@@ -111,11 +113,13 @@ public class ExchangeCodec extends TelnetCodec {
             return super.decode(channel, buffer, readable, header);
         }
         // check length.
+        // Header不完整，需要等待对端发送更多的数据
         if (readable < HEADER_LENGTH) {
             return DecodeResult.NEED_MORE_INPUT;
         }
 
         // get data length.
+        // 从Header解析BodyLength
         int len = Bytes.bytes2int(header, 12);
 
         // When receiving response, how to exceed the length, then directly construct a response to the client.
@@ -125,8 +129,10 @@ public class ExchangeCodec extends TelnetCodec {
             return obj;
         }
 
+        // 总的消息长度
         int tt = len + HEADER_LENGTH;
         if (readable < tt) {
+            // 消息不完整，等待对端传输更多数据
             return DecodeResult.NEED_MORE_INPUT;
         }
 

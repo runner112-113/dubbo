@@ -34,6 +34,8 @@ import io.netty.handler.timeout.IdleStateEvent;
 
 /**
  * NettyServerHandler.
+ *
+ * NettyServerHandler继承自ChannelDuplexHandler，这意味着它可以同时处理入站和出站事件，它仅仅是一个空壳，或者说它是一个适配器，它会在Channel有可读事件时，触发ChannelHandler#received()。
  */
 @io.netty.channel.ChannelHandler.Sharable
 public class NettyServerHandler extends ChannelDuplexHandler {

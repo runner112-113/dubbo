@@ -29,6 +29,12 @@ import org.apache.dubbo.remoting.transport.dispatcher.WrappedChannelHandler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
+/**
+ * 该类的职责是将消息派发到具体的线程处理，这个线程可能是IO线程，也可能是业务线程。
+ * Dubbo将底层通信框架中接收请求的线程称为IO线程，如果事件处理逻辑很简单，全是纯内存操作，那么可以考虑直接在IO线程直接执行，避免了线程切换的开销。
+ * 但是如果事件处理逻辑复杂，涉及到数据库查询等操作，那么强烈建议派发到业务线程池执行，因为IO线程非常宝贵，一旦阻塞导致IO线程被占满，将不会接收新的请求了
+ *
+ */
 public class AllChannelHandler extends WrappedChannelHandler {
 
     public AllChannelHandler(ChannelHandler handler, URL url) {
@@ -37,8 +43,10 @@ public class AllChannelHandler extends WrappedChannelHandler {
 
     @Override
     public void connected(Channel channel) throws RemotingException {
+        // 获取线程池
         ExecutorService executor = getSharedExecutorService();
         try {
+            // 提交异步任务，处理消息
             executor.execute(new ChannelEventRunnable(channel, handler, ChannelState.CONNECTED));
         } catch (Throwable t) {
             throw new ExecutionException(

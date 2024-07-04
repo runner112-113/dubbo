@@ -42,6 +42,7 @@ public class DecodeHandler extends AbstractChannelHandlerDelegate {
         }
 
         if (message instanceof Request) {
+            // Body的反序列化
             decode(((Request) message).getData());
         }
 
