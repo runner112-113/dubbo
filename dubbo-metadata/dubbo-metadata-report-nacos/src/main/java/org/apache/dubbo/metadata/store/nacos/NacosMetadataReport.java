@@ -394,6 +394,7 @@ public class NacosMetadataReport extends AbstractMetadataReport {
     private void storeMetadata(BaseMetadataIdentifier identifier, String value) {
         try {
             boolean publishResult =
+                    // dataId为：org.apache.dubbo.demo.DemoService:1.1.1:dev:provider:dubbo-demo-api-provider
                     configService.publishConfig(identifier.getUniqueKey(KeyTypeEnum.UNIQUE_KEY), group, value);
             if (!publishResult) {
                 throw new RuntimeException("publish nacos metadata failed");

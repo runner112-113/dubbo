@@ -273,6 +273,7 @@ public class NacosRegistry extends FailbackRegistry {
                     notifySubscriber(url, serviceName, listener, instances);
                 }
                 for (String serviceName : serviceNames) {
+                    // 在此处订阅注册中心Nacos
                     subscribeEventListener(serviceName, url, listener);
                 }
             } else {

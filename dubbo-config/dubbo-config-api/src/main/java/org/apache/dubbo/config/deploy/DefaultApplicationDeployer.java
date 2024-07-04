@@ -1156,6 +1156,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
     public void checkState(ModuleModel moduleModel, DeployState moduleState) {
         synchronized (stateLock) {
             if (!moduleModel.isInternal() && moduleState == DeployState.STARTED) {
+                // 此处注册应用
                 prepareApplicationInstance();
             }
             DeployState newState = calculateState();

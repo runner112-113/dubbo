@@ -415,6 +415,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         logger.info("Try to register interface application mapping for service " + url.getServiceKey());
         boolean succeeded = false;
         try {
+            // 注册了接口和应用的映射 mapping
             succeeded = serviceNameMapping.map(url);
             if (succeeded) {
                 logger.info("Successfully registered interface application mapping for service " + url.getServiceKey());
@@ -541,7 +542,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             path = interfaceName;
         }
         doExportUrls(registerType);
-        // 触发ServiceListener的exported方法
+        // 1. 注册了接口和应用的映射 mapping
+        // 2. 触发ServiceListener的exported方法
         exported();
     }
 

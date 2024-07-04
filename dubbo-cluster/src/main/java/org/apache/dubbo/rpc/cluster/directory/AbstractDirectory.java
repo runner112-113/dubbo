@@ -228,7 +228,7 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
                     routerChain.getLock().readLock().unlock();
                 }
             }
-
+            // RouterChain会在此处路由出符合的Invokers
             List<Invoker<T>> routedResult = doList(singleChain, availableInvokers, invocation);
             if (routedResult.isEmpty()) {
                 // 2-2 - No provider available.

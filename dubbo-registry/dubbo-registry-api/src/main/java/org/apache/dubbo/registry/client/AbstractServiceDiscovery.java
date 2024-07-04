@@ -149,6 +149,8 @@ public abstract class AbstractServiceDiscovery implements ServiceDiscovery {
             return;
         }
         if (this.serviceInstance == null) {
+            // 当metaInfo中有hot，port等信息后，
+            // ServiceInstanceHostPortCustomizer会将其填充到ServiceInstance 然后进行注册
             ServiceInstance serviceInstance = createServiceInstance(this.metadataInfo);
             if (!isValidInstance(serviceInstance)) {
                 return;

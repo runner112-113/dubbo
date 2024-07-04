@@ -42,6 +42,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * If there is only one invoker, use the invoker directly;
  * if there are multiple invokers and the weights are not the same, then random according to the total weight;
  * if there are multiple invokers and the same weight, then randomly called.
+ *
+ * 最快响应，选出响应时间最短的提供者
  */
 public class ShortestResponseLoadBalance extends AbstractLoadBalance implements ScopeModelAware {
 

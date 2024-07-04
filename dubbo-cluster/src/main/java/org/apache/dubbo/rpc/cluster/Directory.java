@@ -40,6 +40,9 @@ public interface Directory<T> extends Node {
      * get service type.
      *
      * @return service type.
+     *
+     * 服务接口
+     * 一个接口对应一个Directory实例
      */
     Class<T> getInterface();
 
@@ -48,15 +51,21 @@ public interface Directory<T> extends Node {
      * filtered by invocation
      *
      * @return invokers
+     *
+     *  获取可用的Invoker
+     *  根据Router过滤掉部分服务
      */
     List<Invoker<T>> list(Invocation invocation) throws RpcException;
 
     /**
      * list invokers
      * include all invokers from registry
+     *
+     * 获取所有Invoker
      */
     List<Invoker<T>> getAllInvokers();
 
+    // 消费者url
     URL getConsumerUrl();
 
     boolean isDestroyed();

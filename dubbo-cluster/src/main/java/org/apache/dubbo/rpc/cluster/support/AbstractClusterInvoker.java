@@ -161,6 +161,7 @@ public abstract class AbstractClusterInvoker<T> implements ClusterInvoker<T> {
         }
         String methodName = invocation == null ? StringUtils.EMPTY_STRING : RpcUtils.getMethodName(invocation);
 
+        // 是否开启粘滞连接
         boolean sticky =
                 invokers.get(0).getUrl().getMethodParameter(methodName, CLUSTER_STICKY_KEY, DEFAULT_CLUSTER_STICKY);
 
@@ -196,6 +197,7 @@ public abstract class AbstractClusterInvoker<T> implements ClusterInvoker<T> {
             checkShouldInvalidateInvoker(tInvoker);
             return tInvoker;
         }
+        // 负载均衡选出Invoker
         Invoker<T> invoker = loadbalance.select(invokers, getUrl(), invocation);
 
         // If the `invoker` is in the  `selected` or invoker is unavailable && availablecheck is true, reselect.
@@ -205,8 +207,15 @@ public abstract class AbstractClusterInvoker<T> implements ClusterInvoker<T> {
         if (isUnavailable) {
             invalidateInvoker(invoker);
         }
+
+        /**
+         * 判断是否需要重新负载均衡
+         * 1.选出的Invoker已经被使用过
+         * 2.连接不可用且开启连接可用性检测
+         */
         if (isSelected || isUnavailable) {
             try {
+                // 重新负载
                 Invoker<T> rInvoker = reselect(loadbalance, invocation, invokers, selected, availableCheck);
                 if (rInvoker != null) {
                     invoker = rInvoker;

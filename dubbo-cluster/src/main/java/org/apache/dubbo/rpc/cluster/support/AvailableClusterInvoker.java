@@ -28,6 +28,7 @@ import java.util.List;
 /**
  * AvailableClusterInvoker
  *
+ * 不做负载均衡，遍历所有服务列表，找到第一个可用的节点直接发起调用
  */
 public class AvailableClusterInvoker<T> extends AbstractClusterInvoker<T> {
 

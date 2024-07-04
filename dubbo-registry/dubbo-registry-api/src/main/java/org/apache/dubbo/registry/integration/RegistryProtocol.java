@@ -136,6 +136,8 @@ import static org.apache.dubbo.rpc.model.ScopeModelUtil.getApplicationModel;
 
 /**
  * TODO, replace RegistryProtocol completely in the future.
+ *
+ * 应用级注册
  */
 public class RegistryProtocol implements Protocol, ScopeModelAware {
     public static final String[] DEFAULT_REGISTER_PROVIDER_KEYS = {

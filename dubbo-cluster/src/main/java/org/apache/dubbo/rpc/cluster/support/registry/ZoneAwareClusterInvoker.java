@@ -46,6 +46,9 @@ import static org.apache.dubbo.common.constants.RegistryConstants.ZONE_KEY;
  * 1. registry marked as 'preferred=true' has the highest priority.
  * 2. check the zone the current request belongs, pick the registry that has the same zone first.
  * 3. Evenly balance traffic between all registries based on each registry's weight.
+ *
+ *
+ * 具备区域感知能力，优先调用同区域的服务
  */
 public class ZoneAwareClusterInvoker<T> extends AbstractClusterInvoker<T> {
 

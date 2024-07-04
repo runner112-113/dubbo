@@ -23,6 +23,8 @@ import org.apache.dubbo.rpc.cluster.support.wrapper.AbstractCluster;
 /**
  * BroadcastCluster
  *
+ * 广播调用所有可用的服务，任意一个节点报错则报错
+ *
  */
 public class BroadcastCluster extends AbstractCluster {
 

@@ -38,6 +38,13 @@ import static org.apache.dubbo.rpc.cluster.Constants.WEIGHT_KEY;
  * If the weights are different then it will use random.nextInt(w1 + w2 + ... + wn)
  * Note that if the performance of the machine is better than others, you can set a larger weight.
  * If the performance is not so good, you can set a smaller weight.
+ *
+ * 加权随机，默认算法
+ * 加权随机的算法过程：
+ * 1. 判断所有提供者权重是否相同，计算总权重。
+ * 2. 权重相同，直接对数量做随机，返回结束。
+ * 3. 权重不同，对总权重随机一个偏移量offset。
+ * 4. 根据offset落在权重数组的位置，返回提供者。
  */
 public class RandomLoadBalance extends AbstractLoadBalance {
 
@@ -55,6 +62,7 @@ public class RandomLoadBalance extends AbstractLoadBalance {
     @Override
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         // Number of invokers
+        // 提供者数量
         int length = invokers.size();
 
         if (!needWeightLoadBalance(invokers, invocation)) {
@@ -62,8 +70,10 @@ public class RandomLoadBalance extends AbstractLoadBalance {
         }
 
         // Every invoker has the same weight?
+        // 是否每个提供者权重都相同
         boolean sameWeight = true;
         // the maxWeight of every invoker, the minWeight = 0 or the maxWeight of the last invoker
+        // 权重
         int[] weights = new int[length];
         // The sum of weights
         int totalWeight = 0;
@@ -80,8 +90,11 @@ public class RandomLoadBalance extends AbstractLoadBalance {
         if (totalWeight > 0 && !sameWeight) {
             // If (not every invoker has the same weight & at least one invoker's weight>0), select randomly based on
             // totalWeight.
+            // 权重不同的情况，加权随机
+            // 对总权重随机一个偏移量
             int offset = ThreadLocalRandom.current().nextInt(totalWeight);
             // Return an invoker based on the random value.
+            // 看看偏移量落在数组的哪个位置
             if (length <= 4) {
                 for (int i = 0; i < length; i++) {
                     if (offset < weights[i]) {
@@ -89,6 +102,7 @@ public class RandomLoadBalance extends AbstractLoadBalance {
                     }
                 }
             } else {
+                // 大于4 采用二分法
                 int i = Arrays.binarySearch(weights, offset);
                 if (i < 0) {
                     i = -i - 1;

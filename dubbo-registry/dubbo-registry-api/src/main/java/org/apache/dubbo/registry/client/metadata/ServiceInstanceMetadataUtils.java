@@ -246,6 +246,8 @@ public class ServiceInstanceMetadataUtils {
     }
 
     public static void customizeInstance(ServiceInstance instance, ApplicationModel applicationModel) {
+
+        // ServiceInstanceHostPortCustomizer
         ExtensionLoader<ServiceInstanceCustomizer> loader =
                 instance.getOrDefaultApplicationModel().getExtensionLoader(ServiceInstanceCustomizer.class);
         // FIXME, sort customizer before apply

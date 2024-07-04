@@ -44,10 +44,13 @@ public interface Cluster {
      * @param directory
      * @return cluster invoker
      * @throws RpcException
+     *
+     * // 将一组Invokers聚合成一个ClusterInvoker
      */
     @Adaptive
     <T> Invoker<T> join(Directory<T> directory, boolean buildFilterChain) throws RpcException;
 
+    // 获取集群容错扩展点实现
     static Cluster getCluster(ScopeModel scopeModel, String name) {
         return getCluster(scopeModel, name, true);
     }
