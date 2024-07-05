@@ -63,6 +63,7 @@ public class MetadataInfo implements Serializable {
     // check {@link this#calAndGetRevision}
     private volatile String revision;
     // key format is '{group}/{interface name}:{version}:{protocol}'
+    // 指定服务下对应的所有ServiceInstance
     private final Map<String, ServiceInfo> services;
 
     /* used at runtime */
@@ -149,6 +150,7 @@ public class MetadataInfo implements Serializable {
         }
         List<MetadataParamsFilter> filters = loader.getActivateExtension(url, "params-filter");
         // generate service level metadata
+        // 构建Service级别的Metadata
         ServiceInfo serviceInfo = new ServiceInfo(url, filters);
         this.services.put(serviceInfo.getMatchKey(), serviceInfo);
         // extract common instance level params

@@ -63,6 +63,7 @@ public class ConfigurableMetadataServiceExporter {
                     .getBeanFactory()
                     .getBean(FrameworkExecutorRepository.class)
                     .getInternalServiceExecutor();
+            // 构建MetaService的ServiceConfig
             this.serviceConfig = InternalServiceConfigBuilder.<MetadataService>newBuilder(applicationModel)
                     .interfaceClass(MetadataService.class)
                     .protocol(getApplicationConfig().getMetadataServiceProtocol(), METADATA_SERVICE_PROTOCOL_KEY)

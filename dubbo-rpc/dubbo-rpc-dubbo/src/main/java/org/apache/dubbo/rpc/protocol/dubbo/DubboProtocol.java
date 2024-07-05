@@ -111,6 +111,7 @@ public class DubboProtocol extends AbstractProtocol {
     private final ExchangeHandler requestHandler;
 
     public DubboProtocol(FrameworkModel frameworkModel) {
+        // 消费端请求最终会进这里
         requestHandler = new ExchangeHandlerAdapter(frameworkModel) {
 
             @Override

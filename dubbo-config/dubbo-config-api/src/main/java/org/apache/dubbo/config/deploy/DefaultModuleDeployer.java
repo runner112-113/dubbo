@@ -189,6 +189,7 @@ public class DefaultModuleDeployer extends AbstractDeployer<ModuleModel> impleme
 
                 // register services to registry
                 // 注册服务
+                // 将服务添加到MetadataInfo#services中
                 // metadataInfo.addService(url); 会填充metadataInfo中serviceInfo的host,port等信息
                 // 从而在DefaultApplicationDeployer.registerServiceInstance的异步线程会通过
                 // ServiceInstanceMetadataUtils#refreshMetadataAndInstance注册成功

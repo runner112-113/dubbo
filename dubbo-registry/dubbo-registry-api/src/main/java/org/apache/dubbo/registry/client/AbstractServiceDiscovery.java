@@ -152,6 +152,7 @@ public abstract class AbstractServiceDiscovery implements ServiceDiscovery {
             // 当metaInfo中有hot，port等信息后，
             // ServiceInstanceHostPortCustomizer会将其填充到ServiceInstance 然后进行注册
             ServiceInstance serviceInstance = createServiceInstance(this.metadataInfo);
+            // host,port都有了才可以
             if (!isValidInstance(serviceInstance)) {
                 return;
             }
@@ -160,6 +161,7 @@ public abstract class AbstractServiceDiscovery implements ServiceDiscovery {
         boolean revisionUpdated = calOrUpdateInstanceRevision(this.serviceInstance);
         if (revisionUpdated) {
             reportMetadata(this.metadataInfo);
+            // 真正的注册服务
             doRegister(this.serviceInstance);
         }
     }

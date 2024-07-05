@@ -59,6 +59,8 @@ public abstract class AbstractProtocol implements Protocol, ScopeModelAware {
 
     /**
      * <serviceKey, Exporter> 最终会在此处根据serviceKey --> Exporter --> Invoker
+     *
+     * ServiceKey Pattern：group/path:version:port
      */
     protected final Map<String, Exporter<?>> exporterMap = new ConcurrentHashMap<>();
 

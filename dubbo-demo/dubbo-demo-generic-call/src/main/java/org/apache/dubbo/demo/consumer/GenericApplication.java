@@ -28,13 +28,18 @@ import org.apache.dubbo.rpc.service.GenericService;
 
 public class GenericApplication {
 
+    private static final String REGISTRY_NACOS_URL = "nacos://124.222.122.96:8848";
+
     public static void main(String[] args) {
         runWithBootstrap(args);
     }
 
     private static void runWithBootstrap(String[] args) {
+
         ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
         reference.setInterface("org.apache.dubbo.demo.DemoService");
+        reference.setGroup("dev");
+        reference.setVersion("1.1.1");
 
         String param = "dubbo generic invoke";
 
@@ -48,12 +53,12 @@ public class GenericApplication {
         ApplicationConfig applicationConfig = new ApplicationConfig("demo-consumer");
 
         MetadataReportConfig metadataReportConfig = new MetadataReportConfig();
-        metadataReportConfig.setAddress("zookeeper://127.0.0.1:2181");
+        metadataReportConfig.setAddress(REGISTRY_NACOS_URL);
 
         DubboBootstrap bootstrap = DubboBootstrap.getInstance();
         bootstrap
                 .application(applicationConfig)
-                .registry(new RegistryConfig("zookeeper://127.0.0.1:2181"))
+                .registry(new RegistryConfig(REGISTRY_NACOS_URL))
                 .protocol(new ProtocolConfig(CommonConstants.DUBBO, -1))
                 .reference(reference)
                 .start();

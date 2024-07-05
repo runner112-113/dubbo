@@ -764,7 +764,10 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
         // export MetricsService
         exportMetricsService();
 
-        if (isRegisterConsumerInstance()) { // 暴露MetadataService
+        // 只有当时纯的消费者时 才不用注册，
+        // 即通过applicationConfig.setRegisterConsumer(true)设置为纯消费者
+        if (isRegisterConsumerInstance()) {
+            // 暴露MetadataService
             exportMetadataService();
             if (hasPreparedApplicationInstance.compareAndSet(false, true)) {
                 // register the local ServiceInstance if required
@@ -1155,6 +1158,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
     @Override
     public void checkState(ModuleModel moduleModel, DeployState moduleState) {
         synchronized (stateLock) {
+            // 要不是内部的module
             if (!moduleModel.isInternal() && moduleState == DeployState.STARTED) {
                 // 此处注册应用
                 prepareApplicationInstance();

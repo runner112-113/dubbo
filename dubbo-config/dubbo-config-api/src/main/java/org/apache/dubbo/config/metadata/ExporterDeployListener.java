@@ -75,6 +75,7 @@ public class ExporterDeployListener implements ApplicationDeployListener, Priori
     @Override
     public synchronized void onModuleStarted(ApplicationModel applicationModel) {
         // start metadata service exporter
+        // 获取或构建MetaService的实现类MetadataServiceDelegation
         MetadataServiceDelegation metadataService =
                 applicationModel.getBeanFactory().getOrRegisterBean(MetadataServiceDelegation.class);
         if (metadataServiceExporter == null) {
