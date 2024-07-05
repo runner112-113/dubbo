@@ -225,6 +225,7 @@ public class ProtocolConfig extends AbstractConfig {
 
     /*
      * Extra Protocol for this service, using Port Unification Server
+     * ext-protocol参数支持配置多个不同的协议，协议之间通过",“进行分隔
      */
     private String extProtocol;
 

@@ -98,6 +98,10 @@ public interface Constants {
 
     String SERVER_KEY = "server";
 
+    /**
+     * 全称为 InternalSpuServer,通常被称为 ISPUServer。
+     * 这个类的作用是处理 Netty 中的端口统一化，将不同的协议请求分发给相应的处理器
+     */
     String IS_PU_SERVER_KEY = "ispuserver";
 
     String CLIENT_KEY = "client";
