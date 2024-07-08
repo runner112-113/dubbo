@@ -21,3 +21,4 @@ import java.util.concurrent.Executor;
 public interface ExecutorSupport {
     Executor getExecutor(Object data);
 }
+
