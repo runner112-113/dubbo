@@ -1274,6 +1274,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
         }
         for (DeployListener<ApplicationModel> listener : listeners) {
             try {
+                // ExporterDeployListener在此暴露MetadataService
                 if (listener instanceof ApplicationDeployListener) {
                     ((ApplicationDeployListener) listener).onModuleStarted(applicationModel);
                 }

@@ -140,6 +140,7 @@ public class ReferenceAnnotationBeanPostProcessor extends AbstractAnnotationBean
         String[] beanNames = beanFactory.getBeanDefinitionNames();
         for (String beanName : beanNames) {
             Class<?> beanType;
+            // 工厂bean
             if (beanFactory.isFactoryBean(beanName)) {
                 BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
                 if (isReferenceBean(beanDefinition)) {
@@ -375,12 +376,14 @@ public class ReferenceAnnotationBeanPostProcessor extends AbstractAnnotationBean
     protected void prepareInjection(AnnotatedInjectionMetadata metadata) throws BeansException {
         try {
             // find and register bean definition for @DubboReference/@Reference
+            // 属性注入
             for (AnnotatedFieldElement fieldElement : metadata.getFieldElements()) {
                 if (fieldElement.injectedObject != null) {
                     continue;
                 }
                 Class<?> injectedType = fieldElement.field.getType();
                 AnnotationAttributes attributes = fieldElement.attributes;
+                // 注册ReferenceBean到IOC 以及referenceBeanManager中
                 String referenceBeanName = registerReferenceBean(
                         fieldElement.getPropertyName(), injectedType, attributes, fieldElement.field);
 
@@ -389,6 +392,7 @@ public class ReferenceAnnotationBeanPostProcessor extends AbstractAnnotationBean
                 injectedFieldReferenceBeanCache.put(fieldElement, referenceBeanName);
             }
 
+            // 方法注入
             for (AnnotatedMethodElement methodElement : metadata.getMethodElements()) {
                 if (methodElement.injectedObject != null) {
                     continue;

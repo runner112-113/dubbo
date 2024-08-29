@@ -277,6 +277,7 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
         // 是否立即注册 service-discovery-registry中的register为false，所以此时不是立即注册
         boolean register = providerUrl.getParameter(REGISTER_KEY, true) && registryUrl.getParameter(REGISTER_KEY, true);
         if (register) {
+            // 将提供者的url配置写入Zookeeper的provider节点下面
             register(registry, registeredProviderUrl);
         }
 

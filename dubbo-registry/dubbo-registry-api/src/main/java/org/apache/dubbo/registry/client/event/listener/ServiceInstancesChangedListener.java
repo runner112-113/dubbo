@@ -82,7 +82,7 @@ public class ServiceInstancesChangedListener {
     protected AtomicBoolean destroyed = new AtomicBoolean(false);
 
     protected Map<String, List<ServiceInstance>> allInstances;
-    protected Map<String, List<ProtocolServiceKeyWithUrls>> serviceUrls;
+    protected Map<String/*interfaceName*/, List<ProtocolServiceKeyWithUrls>> serviceUrls;
 
     private volatile long lastRefreshTime;
     private final Semaphore retryPermission;
@@ -139,8 +139,9 @@ public class ServiceInstancesChangedListener {
             logger.debug(event.getServiceInstances().toString());
         }
 
+        // 根据修订号来区分serviceInstance
         Map<String, List<ServiceInstance>> revisionToInstances = new HashMap<>();
-        Map<ServiceInfo, Set<String>> localServiceToRevisions = new HashMap<>();
+        Map<ServiceInfo, Set<String>/*revision*/> localServiceToRevisions = new HashMap<>();
 
         // grouping all instances of this app(service name) by revision
         for (Map.Entry<String, List<ServiceInstance>> entry : allInstances.entrySet()) {
@@ -165,6 +166,7 @@ public class ServiceInstancesChangedListener {
             List<ServiceInstance> subInstances = entry.getValue();
 
             // 远程获取元信息
+            // 相同修订号的元数据随机选取一台机器获取 然后填充
             MetadataInfo metadata = subInstances.stream()
                     .map(ServiceInstance::getServiceMetadata)
                     .filter(Objects::nonNull)
@@ -402,6 +404,7 @@ public class ServiceInstancesChangedListener {
     protected Object getServiceUrlsCache(
             Map<String, List<ServiceInstance>> revisionToInstances, Set<String> revisions, String protocol, int port) {
         List<URL> urls = new ArrayList<>();
+        // 不同的修订号 构建不同的url
         for (String r : revisions) {
             for (ServiceInstance i : revisionToInstances.get(r)) {
                 if (port > 0) {
