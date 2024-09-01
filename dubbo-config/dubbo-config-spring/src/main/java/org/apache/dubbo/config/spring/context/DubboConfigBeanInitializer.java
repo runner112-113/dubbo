@@ -87,6 +87,7 @@ public class DubboConfigBeanInitializer implements BeanFactoryAware, Initializin
             referenceBeanManager = beanFactory.getBean(ReferenceBeanManager.BEAN_NAME, ReferenceBeanManager.class);
             try {
                 prepareDubboConfigBeans();
+                // 将较早的ReferenceBean转换为ReferenceConfig添加到Dubbo的ModuleModel
                 referenceBeanManager.prepareReferenceBeans();
             } catch (Throwable e) {
                 throw new FatalBeanException("Initialization dubbo config beans failed", e);

@@ -365,6 +365,7 @@ public class ServiceAnnotationPostProcessor
         // The attributes of @Service annotation
         Map<String, Object> serviceAnnotationAttributes = AnnotationUtils.getAttributes(service, true);
 
+        // 解析接口名称
         String serviceInterface = resolveInterfaceName(serviceAnnotationAttributes, beanClass);
 
         String annotatedServiceBeanName = beanDefinitionHolder.getBeanName();

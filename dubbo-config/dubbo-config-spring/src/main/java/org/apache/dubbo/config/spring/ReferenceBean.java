@@ -209,6 +209,7 @@ public class ReferenceBean<T>
     @Override
     public T getObject() {
         if (lazyProxy == null) {
+            // 通过生成代理代理提前暴露
             createLazyProxy();
         }
         return (T) lazyProxy;
