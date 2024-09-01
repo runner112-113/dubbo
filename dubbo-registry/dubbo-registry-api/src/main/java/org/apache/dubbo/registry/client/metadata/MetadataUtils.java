@@ -161,6 +161,18 @@ public class MetadataUtils {
         return new ProxyHolder(consumerModel, metadataService, internalModel);
     }
 
+    /**
+     * 获取远程的Metadata，分两种情况：
+     * <ul>
+     *     <ol>service metadata is remote mode,get metadata from metadata center</ol>
+     *     <ol>service metadata is save in service locally,invoke MetadataService#getMetadataInfo by dubbo rpc</ol>
+     * </ul>
+     *
+     * @param revision
+     * @param instances
+     * @param metadataReport
+     * @return
+     */
     public static MetadataInfo getRemoteMetadata(
             String revision, List<ServiceInstance> instances, MetadataReport metadataReport) {
         ServiceInstance instance = selectInstance(instances);
@@ -176,6 +188,7 @@ public class MetadataUtils {
                 // change the instance used to communicate to avoid all requests route to the same instance
                 ProxyHolder proxyHolder = null;
                 try {
+                    // 构建MetadataService的代理对象
                     proxyHolder = MetadataUtils.referProxy(instance);
                     metadataInfo = proxyHolder
                             .getProxy()

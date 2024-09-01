@@ -194,6 +194,7 @@ public class ReferenceBeanManager implements ApplicationContextAware {
             referenceConfigMap.put(referenceKey, referenceConfig);
 
             // register ReferenceConfig
+            // 将referenceConfig添加到configManager
             moduleModel.getConfigManager().addReference(referenceConfig);
             moduleModel.getDeployer().setPending();
         }

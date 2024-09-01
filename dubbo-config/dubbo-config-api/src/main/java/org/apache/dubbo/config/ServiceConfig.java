@@ -394,6 +394,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
     protected void exported() {
         exported = true;
         List<URL> exportedURLs = this.getExportedUrls();
+        // 注册接口和应用的映射关系
         exportedURLs.forEach(url -> {
             if (url.getParameters().containsKey(SERVICE_NAME_MAPPING_KEY)) {
                 ServiceNameMapping serviceNameMapping = ServiceNameMapping.getDefaultExtension(getScopeModel());
@@ -577,6 +578,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
         providerModel.setDestroyRunner(getDestroyRunner());
         repository.registerProvider(providerModel);
+        // 加载注册的地址，分为instance，interface，all模式
         // 1. service-discovery-registry://124.222.122.96:8848/org.apache.dubbo.registry.RegistryService?REGISTRY_CLUSTER=default&application=dubbo-demo-api-provider&dubbo=2.0.2&executor-management-mode=isolation&file-cache=true&pid=16940&registry=nacos&timestamp=1719799009495
         // 2. registry://124.222.122.96:8848/org.apache.dubbo.registry.RegistryService?REGISTRY_CLUSTER=default&application=dubbo-demo-api-provider&dubbo=2.0.2&executor-management-mode=isolation&file-cache=true&pid=16940&registry=nacos&timestamp=1719799009495
         List<URL> registryURLs = ConfigValidationUtils.loadRegistries(this, true);

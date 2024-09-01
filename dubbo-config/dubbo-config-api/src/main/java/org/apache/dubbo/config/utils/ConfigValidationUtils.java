@@ -199,6 +199,7 @@ public class ConfigValidationUtils {
         // check && override if necessary
         List<URL> registryList = new ArrayList<>();
         ApplicationConfig application = interfaceConfig.getApplication();
+        // 获取到一个接口配置注册地址
         List<RegistryConfig> registries = interfaceConfig.getRegistries();
         if (CollectionUtils.isNotEmpty(registries)) {
             for (RegistryConfig config : registries) {
@@ -270,6 +271,7 @@ public class ConfigValidationUtils {
                         result.add(interfaceCompatibleRegistryURL);
                     }
                 } else {
+                    // 双注册模式配置查询 对应参数为dubbo.application.register-mode 默认值为all
                     registerMode = registryURL.getParameter(
                             REGISTER_MODE_KEY,
                             ConfigurationUtils.getCachedDynamicProperty(
@@ -277,6 +279,8 @@ public class ConfigValidationUtils {
                     if (!isValidRegisterMode(registerMode)) {
                         registerMode = DEFAULT_REGISTER_MODE_INTERFACE;
                     }
+                    // instance
+                    // 满足应用级注册就添加一个应用级注册的地址
                     if ((DEFAULT_REGISTER_MODE_INSTANCE.equalsIgnoreCase(registerMode)
                                     || DEFAULT_REGISTER_MODE_ALL.equalsIgnoreCase(registerMode))
                             && registryNotExists(registryURL, registryList, SERVICE_REGISTRY_PROTOCOL)) {
@@ -287,6 +291,8 @@ public class ConfigValidationUtils {
                         result.add(serviceDiscoveryRegistryURL);
                     }
 
+                    // interface
+                    // 满足接口级注册配置就添加一个接口级注册地址
                     if (DEFAULT_REGISTER_MODE_INTERFACE.equalsIgnoreCase(registerMode)
                             || DEFAULT_REGISTER_MODE_ALL.equalsIgnoreCase(registerMode)) {
                         result.add(registryURL);

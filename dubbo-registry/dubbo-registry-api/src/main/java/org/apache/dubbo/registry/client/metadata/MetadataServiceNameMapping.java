@@ -120,7 +120,7 @@ public class MetadataServiceNameMapping extends AbstractServiceNameMapping {
                         }
                         newConfigContent = oldConfigContent + COMMA_SEPARATOR + appName;
                     }
-                    // 注册了接口和应用的映射 mapping
+                    // 注册了接口和应用的映射 ServiceAppMapping
                     succeeded = metadataReport.registerServiceAppMapping(
                             serviceInterface, DEFAULT_MAPPING_GROUP, newConfigContent, configItem.getTicket());
                     if (!succeeded) {

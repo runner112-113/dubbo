@@ -421,6 +421,7 @@ public abstract class AbstractAnnotationBeanPostProcessor
         @Override
         protected void inject(Object bean, String beanName, PropertyValues pvs) throws Throwable {
 
+            // 通过injectedElement.injectedObject作为beanName获取对象
             Object injectedObject = getInjectedObject(attributes, bean, beanName, getInjectedType(), this);
 
             if (member instanceof Field) {

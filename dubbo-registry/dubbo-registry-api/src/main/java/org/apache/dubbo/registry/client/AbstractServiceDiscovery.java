@@ -230,6 +230,12 @@ public abstract class AbstractServiceDiscovery implements ServiceDiscovery {
         }
     }
 
+    /**
+     * 获取远程的ServiceMetadata
+     * @param revision
+     * @param instances
+     * @return
+     */
     @Override
     public MetadataInfo getRemoteMetadata(String revision, List<ServiceInstance> instances) {
         MetadataInfo metadata = metaCacheManager.get(revision);
@@ -303,6 +309,7 @@ public abstract class AbstractServiceDiscovery implements ServiceDiscovery {
 
     @Override
     public void register(URL url) {
+        // 缓存元数据
         metadataInfo.addService(url);
     }
 

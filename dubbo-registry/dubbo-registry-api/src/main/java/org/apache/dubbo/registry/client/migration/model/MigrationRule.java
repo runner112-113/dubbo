@@ -270,6 +270,7 @@ public class MigrationRule {
 
         if (applications != null) {
             ServiceNameMapping serviceNameMapping = ServiceNameMapping.getDefaultExtension(consumerURL.getScopeModel());
+            // 根据接口获取应用
             Set<String> services = serviceNameMapping.getRemoteMapping(consumerURL);
             if (CollectionUtils.isNotEmpty(services)) {
                 for (String service : services) {

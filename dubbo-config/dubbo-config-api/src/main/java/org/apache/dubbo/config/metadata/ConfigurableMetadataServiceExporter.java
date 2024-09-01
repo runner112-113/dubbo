@@ -74,6 +74,7 @@ public class ConfigurableMetadataServiceExporter {
                     .build(configConsumer -> configConsumer.setMethods(generateMethodConfig()));
 
             // export
+            // 暴露MetadataService
             serviceConfig.export();
 
             metadataService.setMetadataURL(serviceConfig.getExportedUrls().get(0));

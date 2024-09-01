@@ -148,6 +148,7 @@ public class MetadataInfo implements Serializable {
         if (this.loader == null) {
             this.loader = url.getOrDefaultApplicationModel().getExtensionLoader(MetadataParamsFilter.class);
         }
+        // 元数据参数过滤器获取
         List<MetadataParamsFilter> filters = loader.getActivateExtension(url, "params-filter");
         // generate service level metadata
         // 构建Service级别的Metadata
@@ -199,6 +200,7 @@ public class MetadataInfo implements Serializable {
             for (Map.Entry<String, ServiceInfo> entry : new TreeMap<>(services).entrySet()) {
                 sb.append(entry.getValue().toDescString());
             }
+            // MD5计算
             String tempRevision = RevisionResolver.calRevision(sb.toString());
             if (!StringUtils.isEquals(this.revision, tempRevision)) {
                 if (logger.isInfoEnabled()) {
