@@ -86,6 +86,7 @@ public class DubboInfraBeanRegisterPostProcessor
         // Initialize dubbo Environment before ConfigManager
         // Extract dubbo props from Spring env and put them to app config
         ConfigurableEnvironment environment = (ConfigurableEnvironment) applicationContext.getEnvironment();
+        // 从Spring的Environment中过滤出dubbo.的属性，放到dubbo的Environment的appConfiguration中
         SortedMap<String, String> dubboProperties = EnvironmentUtils.filterDubboProperties(environment);
         applicationModel.modelEnvironment().getAppConfigMap().putAll(dubboProperties);
 
