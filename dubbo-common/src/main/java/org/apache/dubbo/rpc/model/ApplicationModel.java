@@ -59,7 +59,7 @@ public class ApplicationModel extends ScopeModel {
     public static final String NAME = "ApplicationModel";
     // 所有ModuleModel实例对象集合
     private final List<ModuleModel> moduleModels = new CopyOnWriteArrayList<>();
-    // 发布的ModuleModel实例对象集合
+    // 发布的ModuleModel实例对象集合，除了internal的Module
     private final List<ModuleModel> pubModuleModels = new CopyOnWriteArrayList<>();
     // 环境信息Environment实例对象
     private volatile Environment environment;
@@ -121,6 +121,7 @@ public class ApplicationModel extends ScopeModel {
             }
             initialize();
 
+            // 会创建一个内部的module，并且index为0
             this.internalModule = new ModuleModel(this, true);
             this.serviceRepository = new ServiceRepository(this);
 

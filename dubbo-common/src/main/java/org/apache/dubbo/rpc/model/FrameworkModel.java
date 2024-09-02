@@ -53,7 +53,7 @@ public class FrameworkModel extends ScopeModel {
 
     private static volatile FrameworkModel defaultInstance;
 
-    // FrameworkModel实例对象集合
+    // FrameworkModel实例对象集合（同一个JVM上）
     private static final List<FrameworkModel> allInstances = new CopyOnWriteArrayList<>();
 
     // ========================= Static Fields End ===================================

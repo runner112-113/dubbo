@@ -212,6 +212,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
             if (initialized) {
                 return;
             }
+            // 触发DeployListener#onInitialize
             onInitialize();
 
             // register shutdown hook
@@ -244,6 +245,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
 
     private void initModuleDeployers() {
         // make sure created default module
+        // 确保至少有一个非internal的Module
         applicationModel.getDefaultModule();
         // deployer initialize
         for (ModuleModel moduleModel : applicationModel.getModuleModels()) {
@@ -713,6 +715,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
     }
 
     private void doStart() {
+        // 启动每一个Module
         startModules();
 
         // prepare application instance
