@@ -292,6 +292,7 @@ public class ExchangeCodec extends TelnetCodec {
             // heartbeat request data is always null
             bos.write(CodecSupport.getNullBytesOf(serialization));
         } else {
+            // 根据url获取ObjectOutput对象
             ObjectOutput out = serialization.serialize(channel.getUrl(), bos);
             if (req.isEvent()) {
                 encodeEventData(channel, out, req.getData());
@@ -309,11 +310,13 @@ public class ExchangeCodec extends TelnetCodec {
         int len = bos.writtenBytes();
         // 校验负载，Body是否太大
         checkPayload(channel, req.getPayload(), len);
+        // 最后4位是body的长度
         Bytes.int2bytes(len, header, 12);
 
         // write
         buffer.writerIndex(savedWriteIndex);
-        buffer.writeBytes(header); // write header.
+        // write header.
+        buffer.writeBytes(header);
         buffer.writerIndex(savedWriteIndex + HEADER_LENGTH + len);
     }
 

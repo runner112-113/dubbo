@@ -65,6 +65,8 @@ public final class NettyCodecAdapter {
         @Override
         protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
             boolean encoded = false;
+
+            // 为ByteBuf 则是已经编码过了
             if (msg instanceof ByteBuf) {
                 out.writeBytes(((ByteBuf) msg));
                 encoded = true;
@@ -79,6 +81,7 @@ public final class NettyCodecAdapter {
                 }
             }
 
+            // 如果在业务线程没有编码的话 会在此处的I/O线程进行编码
             if (!encoded) {
                 ChannelBuffer buffer = new NettyBackedChannelBuffer(out);
                 Channel ch = ctx.channel();
@@ -102,6 +105,7 @@ public final class NettyCodecAdapter {
             do {
                 // 先保存读索引
                 int saveReaderIndex = message.readerIndex();
+                // 此处I/O线程默认不对requestData进行解码
                 Object msg = codec.decode(channel, message);
                 if (msg == Codec2.DecodeResult.NEED_MORE_INPUT) {
                     // 读到的数据不完整，恢复读索引，等待对端发送更多的数据

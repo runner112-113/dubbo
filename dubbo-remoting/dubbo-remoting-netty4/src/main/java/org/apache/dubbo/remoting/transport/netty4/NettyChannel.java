@@ -187,6 +187,7 @@ final class NettyChannel extends AbstractChannel {
         int timeout = 0;
         try {
             Object outputMessage = message;
+            // 判断是不是在I/O线程编码
             if (!encodeInIOThread) {
                 ByteBuf buf = channel.alloc().buffer();
                 ChannelBuffer buffer = new NettyBackedChannelBuffer(buf);

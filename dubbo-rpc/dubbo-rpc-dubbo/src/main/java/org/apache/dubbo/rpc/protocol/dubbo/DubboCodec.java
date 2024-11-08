@@ -60,6 +60,7 @@ import static org.apache.dubbo.rpc.protocol.dubbo.Constants.DEFAULT_DECODE_IN_IO
 public class DubboCodec extends ExchangeCodec {
 
     public static final String NAME = "dubbo";
+    // dubbo协议的版本
     public static final String DUBBO_VERSION = Version.getProtocolVersion();
     public static final byte RESPONSE_WITH_EXCEPTION = 0;
     public static final byte RESPONSE_VALUE = 1;
@@ -307,6 +308,7 @@ public class DubboCodec extends ExchangeCodec {
 
         out.writeUTF(version);
         // https://github.com/apache/dubbo/issues/6138
+        // interfaceName
         String serviceName = inv.getAttachment(INTERFACE_KEY);
         if (serviceName == null) {
             serviceName = inv.getAttachment(PATH_KEY);
