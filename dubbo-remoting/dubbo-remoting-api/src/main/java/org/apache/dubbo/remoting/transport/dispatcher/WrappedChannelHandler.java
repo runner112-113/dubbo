@@ -119,6 +119,7 @@ public class WrappedChannelHandler implements ChannelHandlerDelegate {
     public ExecutorService getPreferredExecutorService(Object msg) {
         if (msg instanceof Response) {
             Response response = (Response) msg;
+            // 根据response的id 拿到对应的请求Future
             DefaultFuture responseFuture = DefaultFuture.getFuture(response.getId());
             // a typical scenario is the response returned after timeout, the timeout response may have completed the
             // future

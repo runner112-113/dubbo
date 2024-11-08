@@ -222,7 +222,7 @@ public class DefaultExecutorRepository implements ExecutorRepository, ExtensionA
 
         // Consumer's executor is sharing globally, key=Integer.MAX_VALUE. Provider's executor is sharing by protocol.
         // 消费端的线程池是共享的key为Integer.MAX_VALUE
-        // 提供端的线程池是根据protocol来共享的key为port
+        // 生产端的线程池是根据protocol来共享的key为port
         String executorCacheKey = getExecutorSecondKey(url);
         ExecutorService executor = executors.get(executorCacheKey);
         if (executor != null && (executor.isShutdown() || executor.isTerminated())) {

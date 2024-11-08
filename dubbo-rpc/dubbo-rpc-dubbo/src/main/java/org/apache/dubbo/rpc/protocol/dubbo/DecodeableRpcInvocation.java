@@ -179,6 +179,7 @@ public class DecodeableRpcInvocation extends RpcInvocation implements Codec, Dec
                 addObjectAttachments(map);
             }
 
+            // 解码参数
             decodeArgument(channel, pts, args);
         } catch (ClassNotFoundException e) {
             throw new IOException(StringUtils.toString("Read invocation data failed.", e));

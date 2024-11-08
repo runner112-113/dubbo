@@ -117,6 +117,7 @@ public class DubboCodec extends ExchangeCodec {
                     } else {
                         DecodeableRpcResult result;
                         Invocation inv = (Invocation) getRequestData(channel, res, id);
+                        // 是否使用I/O线程进行解码
                         if (channel.getUrl().getParameter(DECODE_IN_IO_THREAD_KEY, DEFAULT_DECODE_IN_IO_THREAD)) {
                             if (customByteAccessor != null) {
                                 result = customByteAccessor.getRpcResult(
@@ -125,6 +126,7 @@ public class DubboCodec extends ExchangeCodec {
                                 result = new DecodeableRpcResult(
                                         channel, res, new UnsafeByteArrayInputStream(readMessageData(is)), inv, proto);
                             }
+                            // 直接I/O线程decode
                             result.decode();
                         } else {
                             if (customByteAccessor != null) {
@@ -184,6 +186,7 @@ public class DubboCodec extends ExchangeCodec {
                     req.setPayload(len);
 
                     DecodeableRpcInvocation inv;
+                    // 判断是否在I/O线程解码
                     if (isDecodeDataInIoThread(channel)) {
                         if (customByteAccessor != null) {
                             inv = customByteAccessor.getRpcInvocation(
@@ -196,12 +199,14 @@ public class DubboCodec extends ExchangeCodec {
                                     new UnsafeByteArrayInputStream(readMessageData(is)),
                                     proto);
                         }
+                        // 直接I/O线程解码
                         inv.decode();
                     } else {
                         if (customByteAccessor != null) {
                             inv = customByteAccessor.getRpcInvocation(
                                     channel, req, new UnsafeByteArrayInputStream(readMessageData(is)), proto);
                         } else {
+                            // 留到后面业务线程进行解码
                             inv = new DecodeableRpcInvocation(
                                     frameworkModel,
                                     channel,
@@ -212,6 +217,7 @@ public class DubboCodec extends ExchangeCodec {
                     }
                     data = inv;
                 }
+                // DecodeableRpcInvocation
                 req.setData(data);
             } catch (Throwable t) {
                 if (log.isWarnEnabled()) {
@@ -227,6 +233,11 @@ public class DubboCodec extends ExchangeCodec {
         }
     }
 
+    /**
+     * 是否在I/O线程进行解码操作
+     * @param channel
+     * @return
+     */
     private boolean isDecodeDataInIoThread(Channel channel) {
         Object obj = channel.getAttribute(DECODE_IN_IO_THREAD_KEY);
         if (obj instanceof Boolean) {

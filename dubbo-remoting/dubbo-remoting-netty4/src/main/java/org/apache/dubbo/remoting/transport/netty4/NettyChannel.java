@@ -190,6 +190,7 @@ final class NettyChannel extends AbstractChannel {
             if (!encodeInIOThread) {
                 ByteBuf buf = channel.alloc().buffer();
                 ChannelBuffer buffer = new NettyBackedChannelBuffer(buf);
+                // 发送前编码
                 codec.encode(this, buffer, message);
                 outputMessage = buf;
             }

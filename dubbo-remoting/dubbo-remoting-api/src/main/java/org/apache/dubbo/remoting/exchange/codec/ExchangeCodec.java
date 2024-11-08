@@ -140,6 +140,7 @@ public class ExchangeCodec extends TelnetCodec {
         ChannelBufferInputStream is = new ChannelBufferInputStream(buffer, len);
 
         try {
+            // 解码
             return decodeBody(channel, is, header);
         } finally {
             if (is.available() > 0) {
