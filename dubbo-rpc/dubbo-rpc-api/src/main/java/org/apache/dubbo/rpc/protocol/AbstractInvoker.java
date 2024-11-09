@@ -241,6 +241,7 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
         }
 
         // client context attachment
+        // 拿到所有客户端Attachment
         Map<String, Object> clientContextAttachments =
                 RpcContext.getClientAttachment().getObjectAttachments();
         if (CollectionUtils.isNotEmptyMap(clientContextAttachments)) {
