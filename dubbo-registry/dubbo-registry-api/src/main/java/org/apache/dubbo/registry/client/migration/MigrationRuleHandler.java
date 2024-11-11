@@ -75,12 +75,15 @@ public class MigrationRuleHandler<T> {
             boolean success = true;
             switch (step) {
                 case APPLICATION_FIRST:
+                    // 默认和配置了应用级优先的服务发现则走这里
                     migrationInvoker.migrateToApplicationFirstInvoker(newRule);
                     break;
                 case FORCE_APPLICATION:
+                    // 配置了应用级服务发现则走这里
                     success = migrationInvoker.migrateToForceApplicationInvoker(newRule);
                     break;
                 case FORCE_INTERFACE:
+                    // 配置了接口级服务发现则走这里
                 default:
                     success = migrationInvoker.migrateToForceInterfaceInvoker(newRule);
             }
