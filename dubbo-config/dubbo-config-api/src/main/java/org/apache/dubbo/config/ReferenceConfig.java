@@ -633,7 +633,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
      */
     private void aggregateUrlFromRegistry(Map<String, String> referenceParameters) {
         checkRegistry();
-        // 加载注册中心URL
+        // 加载注册中心URL,Registries 可以指定从哪个注册中心获取
         List<URL> us = ConfigValidationUtils.loadRegistries(this, false);
         if (CollectionUtils.isNotEmpty(us)) {
             for (URL u : us) {

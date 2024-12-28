@@ -184,7 +184,7 @@ public abstract class DynamicDirectory<T> extends AbstractDirectory<T> implement
     }
 
     /**
-     * subscribe()方法会订阅服务，当Provider服务发生变更时会收到通知，触发notify()方法，notify()方法里会将ProviderUrls转换成对应的Invoker，这个待会细说。
+     * subscribe()方法会订阅服务，当Provider服务发生变更时会收到通知，触发notify()方法，notify()方法里会将ProviderUrls转换成对应的Invoker
      */
     public void subscribe(URL url) {
         setSubscribeUrl(url);

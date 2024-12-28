@@ -307,6 +307,7 @@ public class ExchangeCodec extends TelnetCodec {
 
         bos.flush();
         bos.close();
+        // body的长度
         int len = bos.writtenBytes();
         // 校验负载，Body是否太大
         checkPayload(channel, req.getPayload(), len);
