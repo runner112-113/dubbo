@@ -88,6 +88,7 @@ public class ValidationFilter implements Filter {
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         if (needValidate(invoker.getUrl(), invocation.getMethodName())) {
             try {
+                // 通过 url 中 validation 属性值，并且为该方法创建对应的校验实现类
                 Validator validator = validation.getValidator(invoker.getUrl());
                 if (validator != null) {
                     validator.validate(

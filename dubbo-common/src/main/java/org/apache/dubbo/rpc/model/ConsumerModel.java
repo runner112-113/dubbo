@@ -35,7 +35,7 @@ import java.util.TreeSet;
 public class ConsumerModel extends ServiceModel {
     private final Set<String> apps = new TreeSet<>();
 
-    private final Map<String, AsyncMethodInfo> methodConfigs;
+    private final Map<String/*方法名称*/, AsyncMethodInfo> methodConfigs;
     private Map<Method, ConsumerMethodModel> methodModels = new HashMap<>();
 
     /**

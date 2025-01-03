@@ -840,34 +840,42 @@ public class ExtensionLoader<T> {
                 // 反射创建实例并缓存
                 extensionInstances.putIfAbsent(clazz, createExtensionInstance(clazz));
                 instance = (T) extensionInstances.get(clazz);
-                // 前置处理
+                // 初始化前置处理
                 instance = postProcessBeforeInitialization(instance, name);
                 // 执行 setter 注入
                 injectExtension(instance);
-                // 后置处理
+                // 初始化后置处理
                 instance = postProcessAfterInitialization(instance, name);
             }
 
-            // 自动包装
+            // wrap 是否需要进行装饰器包装
             if (wrap) {
                 List<Class<?>> wrapperClassesList = new ArrayList<>();
+                // 看看是否有装饰器包装类，即实现类中单一参数的构造方法是不是SPI接口
                 if (cachedWrapperClasses != null) {
-                    // 包装类排序
+                    // 如果有装饰器包装类，那么就将该 SPI 接口中所有包装实现类进行排序
                     wrapperClassesList.addAll(cachedWrapperClasses);
                     wrapperClassesList.sort(WrapperComparator.COMPARATOR);
                     Collections.reverse(wrapperClassesList);
                 }
 
                 if (CollectionUtils.isNotEmpty(wrapperClassesList)) {
+                    // 循环装饰器包装类，进行层层套娃包装
                     for (Class<?> wrapperClass : wrapperClassesList) {
+                        // 装饰器类上是否 Wrapper 注解
                         Wrapper wrapper = wrapperClass.getAnnotation(Wrapper.class);
-                        // @Wrapper注解匹配，判断是否需要包装
+                        // 1. 没有 wrapper 注解，需要进行包装
+                        // 2. wrapper 中的 matches 字段值为空没有内容，需要进行包装
+                        // 3. wrapper 中的 matches 字段值不为空并包含入参 name 值，并且 mismatches 字段值不包含 name 值，需要进行包装
+                        // 4. 其他情况，可能就是瞎写乱配，导致无法进行包装之类的
                         boolean match = (wrapper == null)
                                 || ((ArrayUtils.isEmpty(wrapper.matches())
                                                 || ArrayUtils.contains(wrapper.matches(), name))
                                         && !ArrayUtils.contains(wrapper.mismatches(), name));
+                        // 如果匹配成功，则进行包装
                         if (match) {
                             // 反射创建包装类实例
+                            // 针对包装的类再次进行实例注入
                             instance = injectExtension(
                                     (T) wrapperClass.getConstructor(type).newInstance(instance));
                             // 包装类的后置处理
@@ -930,12 +938,18 @@ public class ExtensionLoader<T> {
 
         try {
             for (Method method : instance.getClass().getMethods()) {
+                // 判断方法是否是 set 方法，有 3 个条件：
+                // 1. 方法必须是 public 公有修饰属性
+                // 2. 方法名称必须以 set 三个字母开头
+                // 3. 方法的入参个数必须是 1 个
+                // 如果这 3 个条件都不满足的话，那就直接 continue 不做任何处理
                 if (!isSetter(method)) {
                     continue;
                 }
                 /**
                  * Check {@link DisableInject} to see if we need auto-injection for this property
                  */
+                // 如果发现方法上有 @DisableInject 注解的话，则也不做任何处理
                 if (method.isAnnotationPresent(DisableInject.class)) {
                     continue;
                 }
@@ -951,14 +965,22 @@ public class ExtensionLoader<T> {
                     }
                 }
 
+                // 获取方法参数中第 0 个参数的类型
+                // （注意：前面通过 isSetter 已经明确方法的入参只能有 1 个）
                 Class<?> pt = method.getParameterTypes()[0];
+                // 如果参数类型是基本类型的话，那么也不做任何处理了
                 if (ReflectUtils.isPrimitives(pt)) {
                     continue;
                 }
 
                 try {
+                    // 获取方法对应的扩展点名称
+                    // 获取规则是先去掉方法名前面的set三个字符，把剩下的首写字母改为小写后就是方法的属性名。
                     String property = getSetterProperty(method);
+                    // 然后根据【参数类型】+【扩展点名称】直接从容器中找到对应的实例对象
+                    // 所以可以反映出，通过 set 方法就能直接从容器中找到对应的实例并赋值上
                     Object object = injector.getInstance(pt, property);
+                    // 将拿到的实例对象通过反射方式赋值到该 method 方法中的成员变量
                     if (object != null) {
                         method.invoke(instance, object);
                     }
@@ -1367,6 +1389,7 @@ public class ExtensionLoader<T> {
         }
 
         // 是否是自动激活的
+        // 如果该接口的实现类上有 Adaptive 注解的话，则给 cachedAdaptiveClass 字段进行了赋值
         if (clazz.isAnnotationPresent(Adaptive.class)) {
             cacheAdaptiveClass(clazz, overridden);
             // 判断是不是当前类的wrapper类
@@ -1377,7 +1400,7 @@ public class ExtensionLoader<T> {
             if (StringUtils.isEmpty(name)) {
                 // 没有key时，补充key，分两种情况：
                 // 1.标有@Extension 则使用指定的value属性
-                // 2.
+                // 2.default：类名小写，如果后缀后接口名相同则截取
                 name = findAnnotationName(clazz);
                 if (name.length() == 0) {
                     throw new IllegalStateException("No such extension name for the class " + clazz.getName()
@@ -1514,6 +1537,7 @@ public class ExtensionLoader<T> {
             return extension.value();
         }
 
+        // 类名小写，如果后缀后接口名相同则截取
         String name = clazz.getSimpleName();
         if (name.endsWith(type.getSimpleName())) {
             name = name.substring(0, name.length() - type.getSimpleName().length());
@@ -1539,7 +1563,10 @@ public class ExtensionLoader<T> {
     }
 
     private Class<?> getAdaptiveExtensionClass() {
+        // 获取扩展点下的所有实现类，只会加载一次，加载完会进行缓存
         getExtensionClasses();
+        // 如果缓存的自适应扩展点不为空的话，就提前返回
+        // 这里也间接的说明了一点，每个扩展点（比如Cluster）只有一个自适应扩展点对象
         if (cachedAdaptiveClass != null) {
             return cachedAdaptiveClass;
         }
@@ -1556,7 +1583,7 @@ public class ExtensionLoader<T> {
         } catch (Throwable ignore) {
 
         }
-        // 根据Class和默认扩展名，生成Class源码
+        // 根据Class和默认扩展名，生成java源码
         String code = new AdaptiveClassCodeGenerator(type, cachedDefaultName).generate();
         // 获取默认编译器:JavassistCompiler
         org.apache.dubbo.common.compiler.Compiler compiler = extensionDirector

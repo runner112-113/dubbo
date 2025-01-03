@@ -43,6 +43,8 @@ public class JdkProxyFactory extends AbstractProxyFactory {
             @Override
             protected Object doInvoke(T proxy, String methodName, Class<?>[] parameterTypes, Object[] arguments)
                     throws Throwable {
+                // jdk的动态代理
+                // 基于反射 开销很大
                 Method method = proxy.getClass().getMethod(methodName, parameterTypes);
                 return method.invoke(proxy, arguments);
             }

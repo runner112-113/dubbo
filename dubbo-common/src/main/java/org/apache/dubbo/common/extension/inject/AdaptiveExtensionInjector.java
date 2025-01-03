@@ -45,15 +45,20 @@ public class AdaptiveExtensionInjector implements ExtensionInjector, Lifecycle {
 
     @Override
     public void initialize() throws IllegalStateException {
+        // 获取【扩展点注入器】的加载器
         ExtensionLoader<ExtensionInjector> loader = extensionAccessor.getExtensionLoader(ExtensionInjector.class);
+        // 从加载器中拿出所有的可被使用的注册器实现类
         injectors = loader.getSupportedExtensions().stream()
                 .map(loader::getExtension)
+                // 然后通过不可变集合包装起来，意味着不允许别人对注册器实现类进行任何修改
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     @Override
     public <T> T getInstance(final Class<T> type, final String name) {
         return injectors.stream()
+                // 循环每种容器，从容器中根据类型加名字获取实例对象
+                // 一旦获取到了的话，那就直接返回即可，不用再循环其他容器了
                 .map(injector -> injector.getInstance(type, name))
                 .filter(Objects::nonNull)
                 .findFirst()

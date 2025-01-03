@@ -223,6 +223,7 @@ public class AdaptiveClassCodeGenerator {
      * generate method content
      */
     private String generateMethodContent(Method method) {
+        // 判断Method上是否有@Adaptive
         Adaptive adaptiveAnnotation = method.getAnnotation(Adaptive.class);
         StringBuilder code = new StringBuilder(512);
         if (adaptiveAnnotation == null) {
