@@ -62,6 +62,7 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void start() {
+        // 设置异步开启
         if (this.started.compareAndSet(false, true)) {
             this.future = new CompletableFuture<>();
         }
@@ -69,6 +70,7 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void signalContextSwitch() {
+        // 拷贝当前的所有上下文信息
         RpcContext.restoreContext(restoreContext);
         if (restoreClassLoader != null) {
             stagedClassLoader = Thread.currentThread().getContextClassLoader();

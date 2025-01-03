@@ -39,6 +39,7 @@ public class RpcContextAttachment extends RpcContext {
         if (currentContext.asyncContext == null) {
             currentContext.asyncContext = new AsyncContextImpl();
         }
+        // 基于CAS创建CompletableFuture对象
         currentContext.asyncContext.start();
         return currentContext.asyncContext;
     }
