@@ -95,6 +95,8 @@ public class JavassistProxyFactory extends AbstractProxyFactory {
             };
         } catch (Throwable fromJavassist) {
             // try fall back to JDK proxy factory
+            // 这里进行了降级处理，若发现 Wrapper 生成代理出现了未知异常的话，
+            // 那么就降级为通过 JDK 生成代理
             try {
                 Invoker<T> invoker = jdkProxyFactory.getInvoker(proxy, type, url);
                 logger.error(

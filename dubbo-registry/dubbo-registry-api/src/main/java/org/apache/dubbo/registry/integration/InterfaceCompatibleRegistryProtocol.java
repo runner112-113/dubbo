@@ -32,6 +32,7 @@ import static org.apache.dubbo.registry.Constants.DEFAULT_REGISTRY;
 /**
  * RegistryProtocol
  *
+ * 兼容接口级注册协议的实现类，继承了 RegistryProtocol
  * 接口级注册 Dubbo2.x
  */
 public class InterfaceCompatibleRegistryProtocol extends RegistryProtocol {

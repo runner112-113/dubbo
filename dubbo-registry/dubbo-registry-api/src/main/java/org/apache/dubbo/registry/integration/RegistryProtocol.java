@@ -242,12 +242,19 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
         model.addStatedUrl(new ProviderModel.RegisterStatedURL(registeredProviderUrl, registryUrl, registered));
     }
 
+    /**
+     * 远程导出核心逻辑，开启Netty端口服务 + 向注册中心写数据
+     *
+     */
     @Override
     public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcException {
         // 注册中心URL
+        // 从 originInvoker 取出 "registry" 的属性值，结果取出了 zookeeper 值
+        // 然后将 zookeeper 替换协议 "protocol" 属性的值就变成了 registryUrl
         URL registryUrl = getRegistryUrl(originInvoker);
         // url to export locally
         // providerUrl才是服务暴露的真实协议地址
+        // 从 originInvoker.getUrl() 注册中心地址中取出 "export" 属性值
         URL providerUrl = getProviderUrl(originInvoker);
 
         // Subscribe the override data
@@ -265,6 +272,8 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
         providerUrl = overrideUrlWithConfig(providerUrl, overrideSubscribeListener);
         // export invoker
         // 暴露到本地缓存的Exporter
+        // 又看到了一个“本地导出”，此本地导出并不是之前看到的“本地导出”
+        // 这里是注册中心协议实现类的本地导出，是需要本地开启20880端口的netty服务
         final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker, providerUrl);
 
         // url to registry

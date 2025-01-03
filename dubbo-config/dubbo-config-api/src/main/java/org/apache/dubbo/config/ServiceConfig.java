@@ -325,12 +325,13 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 return;
             }
 
+            // Dubbo Config 属性重写
             if (!this.isRefreshed()) {
                 this.refresh();
             }
             if (this.shouldExport()) {
                 this.init();
-
+                // 是否有设置延迟 delay 导出属性
                 if (shouldDelay()) {
                     // should register if delay export
                     doDelayExport();
@@ -340,6 +341,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                     // should not register by default
                     doExport(RegisterTypeEnum.MANUAL_REGISTER);
                 } else {
+                    // 导出的核心逻辑
                     doExport(registerType);
                 }
             }
@@ -542,6 +544,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         if (StringUtils.isEmpty(path)) {
             path = interfaceName;
         }
+        // 因为存在多协议的缘故，所以这里就会将单个接口服务按照不同的协议进行导出
         doExportUrls(registerType);
         // 1. 注册了接口和应用的映射 mapping
         // 2. 触发ServiceListener的exported方法
@@ -583,6 +586,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         // 2. registry://124.222.122.96:8848/org.apache.dubbo.registry.RegistryService?REGISTRY_CLUSTER=default&application=dubbo-demo-api-provider&dubbo=2.0.2&executor-management-mode=isolation&file-cache=true&pid=16940&registry=nacos&timestamp=1719799009495
         List<URL> registryURLs = ConfigValidationUtils.loadRegistries(this, true);
 
+        // 循环调用doExportUrlsFor1Protocol 方法
         for (ProtocolConfig protocolConfig : protocols) {
             String pathKey = URL.buildKey(
                     getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), group, version);
@@ -591,6 +595,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 // In case user specified path, register service one more time to map it to path.
                 repository.registerService(pathKey, interfaceClass);
             }
+            // 将单个接口服务按照单个协议进行导出
             doExportUrlsFor1Protocol(protocolConfig, registryURLs, registerType);
         }
 
@@ -612,6 +617,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
         processServiceExecutor(url);
 
+        // 将单个接口服务按照单协议导出到多个注册中心上
         exportUrl(url, registryURLs, registerType);
 
         initServiceMethodMetrics(url);
@@ -843,6 +849,11 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         return url;
     }
 
+    /**
+     * 方式一：scope 属性值什么也不配置，既会进行本地导出，也会进行远程导出。
+     * 方式二：scope 配置为 local，只会进行本地导出，不会进行远程导出。
+     * 方式三：scope 配置为 remote，只会进行远程导出，不会进行本地导出。
+     */
     private void exportUrl(URL url, List<URL> registryURLs, RegisterTypeEnum registerType) {
         String scope = url.getParameter(SCOPE_KEY);
         // don't export when none is configured
@@ -850,6 +861,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
             // export to local if the config is not remote (export to remote only when config is remote)
             if (!SCOPE_REMOTE.equalsIgnoreCase(scope)) {
+                // 本地导出
                 exportLocal(url);
             }
 
@@ -882,6 +894,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                     if (StringUtils.isNotBlank(protocol)) {
                         URL localUrl =
                                 URLBuilder.from(url).setProtocol(protocol).build();
+                        // 远程导出
                         localUrl = exportRemote(localUrl, registryURLs, registerType);
                         if (!isGeneric(generic) && !getScopeModel().isInternal()) {
                             MetadataUtils.publishServiceDefinition(
@@ -896,24 +909,32 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
     }
 
     private URL exportRemote(URL url, List<URL> registryURLs, RegisterTypeEnum registerType) {
+        // 若注册中心地址集合不为空，则进行 for 循环处理
         if (CollectionUtils.isNotEmpty(registryURLs) && registerType != RegisterTypeEnum.NEVER_REGISTER) {
+            // 开始循环每一个注册中心地址
             for (URL registryURL : registryURLs) {
+                // service-discovery-registry 为了将服务的接口相关信息存储在内存中
                 if (SERVICE_REGISTRY_PROTOCOL.equals(registryURL.getProtocol())) {
                     url = url.addParameterIfAbsent(SERVICE_NAME_MAPPING_KEY, "true");
                 }
 
                 // if protocol is only injvm ,not register
+                // 如果发现注册中心地址是写着 injvm 协议的话，则跳过不做任何导出处理
                 if (LOCAL_PROTOCOL.equalsIgnoreCase(url.getProtocol())) {
                     continue;
                 }
 
+                // dynamic = true 就会在注册中心创建临时节点
+                // dynamic = false 就会在注册中心创建永久节点，若服务器宕机的话，需要人工手动删除注册中心上的提供方 IP 节点
                 url = url.addParameterIfAbsent(DYNAMIC_KEY, registryURL.getParameter(DYNAMIC_KEY));
+                // 监控中心的地址，如果配置了的话，服务调用信息就会上报
                 URL monitorUrl = ConfigValidationUtils.loadMonitor(this, registryURL);
                 if (monitorUrl != null) {
                     url = url.putAttribute(MONITOR_KEY, monitorUrl);
                 }
 
                 // For providers, this is used to enable custom proxy to generate invoker
+                // 在提供方，这里支持自定义来生成代理
                 String proxy = url.getParameter(PROXY_KEY);
                 if (StringUtils.isNotEmpty(proxy)) {
                     registryURL = registryURL.addParameter(PROXY_KEY, proxy);
@@ -928,6 +949,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                     }
                 }
 
+                // 有注册中心的逻辑：远程导出的核心逻辑
+                // 将接口服务的地址内容以 key = export 属性形式，放在 registryURL 中
                 doExportUrl(registryURL.putAttribute(EXPORT_KEY, url), true, registerType);
             }
 
@@ -937,6 +960,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 logger.info("Export dubbo service " + interfaceClass.getName() + " to url " + url);
             }
 
+            // 无注册中心的逻辑：远程导出的核心逻辑
             doExportUrl(url, true, registerType);
         }
 
@@ -961,6 +985,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         if (withMetaData) {
             invoker = new DelegateProviderMetaDataInvoker(invoker, this);
         }
+        // protocolSPI 为协议自定义扩展点
+        // 将 invoker 按照指定的协议进行导出
         Exporter<?> exporter = protocolSPI.export(invoker);
         exporters
                 .computeIfAbsent(registerType, k -> new CopyOnWriteArrayList<>())
@@ -971,6 +997,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
      * always export injvm
      */
     private void exportLocal(URL url) {
+        // 在这里将 url 的 protocol 属性值替换为了 injvm 值
+        // 然后将 url 的 host 属性值替换为了 127.0.0.1
         URL local = URLBuilder.from(url)
                 .setProtocol(LOCAL_PROTOCOL)
                 .setHost(LOCALHOST_VALUE)
