@@ -104,12 +104,15 @@ public class MockClusterInvoker<T> implements ClusterInvoker<T> {
     public Result invoke(Invocation invocation) throws RpcException {
         Result result;
 
+        // 从远程引用的url中看看有没有 mock 属性
         String value = getUrl().getMethodParameter(
                         RpcUtils.getMethodName(invocation), MOCK_KEY, Boolean.FALSE.toString())
                 .trim();
+        // mock 属性值为空的话，相当于没有 mock 逻辑，则直接继续后续逻辑调用
         if (ConfigUtils.isEmpty(value)) {
             // no mock
             result = this.invoker.invoke(invocation);
+            // 如果 mock 属性值是以 force 开头的话
         } else if (value.startsWith(FORCE_KEY)) {
             if (logger.isWarnEnabled()) {
                 logger.warn(
@@ -119,19 +122,28 @@ public class MockClusterInvoker<T> implements ClusterInvoker<T> {
                         "force-mock: " + RpcUtils.getMethodName(invocation) + " force-mock enabled , url : "
                                 + getUrl());
             }
+            // 那么就直接执行 mock 调用逻辑，
+            // 用事先准备好的模拟逻辑或者模拟数据返回
             // force:direct mock
             result = doMockInvoke(invocation, null);
+
+            // 还能来到这说明只是想在调用失败的时候尝试一下 mock 逻辑
         } else {
             // fail-mock
             try {
+                // 先正常执行业务逻辑调用
                 result = this.invoker.invoke(invocation);
 
                 // fix:#4585
+                // 当业务逻辑执行有异常时，并且这个异常类属于RpcException或RpcException子类时，
+                // 还有异常的原因如果是 Dubbo 框架层面的业务异常时，则不做任何处理。
+                // 如果不是业务异常的话，则会继续尝试执行 mock 业务逻辑
                 if (result.getException() != null && result.getException() instanceof RpcException) {
                     RpcException rpcException = (RpcException) result.getException();
                     if (rpcException.isBiz()) {
                         throw rpcException;
                     } else {
+                        // 能来到这里说明是不是业务异常的话，那就执行模拟逻辑
                         result = doMockInvoke(invocation, rpcException);
                     }
                 }

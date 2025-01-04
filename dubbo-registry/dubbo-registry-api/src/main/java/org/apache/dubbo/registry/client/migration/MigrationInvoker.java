@@ -48,6 +48,10 @@ import static org.apache.dubbo.common.constants.LoggerCodeConstants.REGISTRY_FAI
 import static org.apache.dubbo.registry.client.migration.model.MigrationStep.APPLICATION_FIRST;
 import static org.apache.dubbo.rpc.cluster.Constants.REFER_KEY;
 
+/**
+ * dubbo2.x dubbo3.x 新老兼容迁移调用器
+ * @param <T>
+ */
 public class MigrationInvoker<T> implements MigrationClusterInvoker<T> {
     private final ErrorTypeAwareLogger logger = LoggerFactory.getErrorTypeAwareLogger(MigrationInvoker.class);
 

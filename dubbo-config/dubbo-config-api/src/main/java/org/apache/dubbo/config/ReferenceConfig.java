@@ -236,6 +236,8 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 getScopeModel().getDeployer().start();
             }
 
+            // 如果 ref 对象为空，这就初始化一个
+            // 说明引用提供方的每个接口都有着与之对应的一个 ref 对象
             init(check);
         }
 
@@ -518,6 +520,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         MetadataUtils.publishServiceDefinition(consumerUrl, consumerModel.getServiceModel(), getApplicationModel());
 
         // create service proxy
+        // 创建刚刚创建出来的 invoker 对象通过调用proxyFactory.getProxy方法包装成代理对象
         return (T) proxyFactory.getProxy(invoker, ProtocolUtils.isGeneric(generic));
     }
 
@@ -613,6 +616,8 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 url = url.setScopeModel(getScopeModel());
                 url = url.setServiceModel(consumerModel);
                 // 解析，保存到urls集合
+                // 若解析的过程中发现是注册中心地址的话
+                // 那么就会将服务引用的 referenceParameters 整体信息归到注册中心地址的 "refer" 属性上
                 if (UrlUtils.isRegistry(url)) {
                     urls.add(url.putAttribute(REFER_KEY, referenceParameters));
                 } else {
@@ -650,6 +655,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 urls.add(u.putAttribute(REFER_KEY, referenceParameters));
             }
         }
+        // injvm
         // 如果在同一个JVM里，Consumer要引用的服务自身已经提供了，那么Dubbo会尝试直接引用同一个JVM内的服务，这样可以避免网络传输带来的性能损耗
         if (urls.isEmpty() && shouldJvmRefer(referenceParameters)) {
             // 优先引用同一个JVM内的Provider
@@ -699,6 +705,8 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 }
             }
 
+            // 如果循环完了之后，发现含有注册中心地址的话，
+            // 那就继续用集群扩展器包装起来
             if (registryUrl != null) {
                 // registry url is available
                 // for multi-subscription scenario, use 'zone-aware' policy by default

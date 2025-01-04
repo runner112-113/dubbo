@@ -547,7 +547,7 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
-        // 重写URL，获取注册中心URL
+        // 重写URL，获取注册中心URL,由 registry 协议替换成了 zookeeper/nacos协议
         // nacos://124.222.122.96:8848/org.apache.dubbo.registry.RegistryService?REGISTRY_CLUSTER=default&application=dubbo-demo-api-consumer&dubbo=2.0.2&executor-management-mode=isolation&file-cache=true&pid=13192&timestamp=1719833428718
         url = getRegistryUrl(url);
         // 获取用于操作的Registry类型：nacos、zookeeper
@@ -557,6 +557,7 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
         }
 
         // group="a,b" or group="*"
+        // 这里涉及一个一个分组的概念，不过常常会和 merger 聚合参数一起使用
         Map<String, String> qs = (Map<String, String>) url.getAttribute(REFER_KEY);
         String group = qs.get(GROUP_KEY);
         if (StringUtils.isNotEmpty(group)) {
@@ -652,6 +653,10 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
         directory.setRegistry(registry);
         directory.setProtocol(protocol);
         // all attributes of REFER_KEY
+        // 这里构建了一个需要写到注册中心的地址信息
+        // 之前在导出的方法中我们也看到了提供者会把服务接口的地址信息写到注册中心上
+        // 结果这里同样写到注册中心上，说明只要是 dubbo 服务，不管是提供者还是消费者，
+        // 最终都会把自己的提供的服务接口信息，或需要订阅的服务接口信息，都会写到注册中心去
         Map<String, String> parameters =
                 new HashMap<>(directory.getConsumerUrl().getParameters());
         URL urlToRegistry = new ServiceConfigURL(
@@ -668,8 +673,10 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
             registry.register(directory.getRegisteredConsumerUrl());
         }
         // 构建RouterChain，每个Directory都有一条Router路由链，Dubbo的路由机制可以根据路由规则对Provider进行筛选
+        // 设置路由规则
         directory.buildRouterChain(urlToRegistry);
         // 订阅服务，服务变更时触发notify()
+        // 构建订阅的地址 subscribeUrl 然后发起订阅，然后会监听注册中心的目录
         directory.subscribe(toSubscribeUrl(urlToRegistry));
 
         // 创建Invoker对象

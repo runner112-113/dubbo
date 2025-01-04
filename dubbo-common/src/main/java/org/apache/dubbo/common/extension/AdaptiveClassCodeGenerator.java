@@ -367,6 +367,7 @@ public class AdaptiveClassCodeGenerator {
         String[] value = adaptiveAnnotation.value();
         // value is not set, use the value generated from class name as the key
         if (value.length == 0) {
+            // 默认拿类的小写
             String splitName = StringUtils.camelToSplitName(type.getSimpleName(), ".");
             value = new String[] {splitName};
         }
