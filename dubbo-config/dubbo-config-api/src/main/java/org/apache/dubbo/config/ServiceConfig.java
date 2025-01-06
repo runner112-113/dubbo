@@ -586,7 +586,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         // 2. registry://124.222.122.96:8848/org.apache.dubbo.registry.RegistryService?REGISTRY_CLUSTER=default&application=dubbo-demo-api-provider&dubbo=2.0.2&executor-management-mode=isolation&file-cache=true&pid=16940&registry=nacos&timestamp=1719799009495
         List<URL> registryURLs = ConfigValidationUtils.loadRegistries(this, true);
 
-        // 循环调用doExportUrlsFor1Protocol 方法
+        // 根据不同的协议(dubbo/rest等)循环调用doExportUrlsFor1Protocol 方法
         for (ProtocolConfig protocolConfig : protocols) {
             String pathKey = URL.buildKey(
                     getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), group, version);
@@ -950,8 +950,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                     }
                 }
 
-                // 有注册中心的逻辑：远程导出的核心逻辑
-                // 将接口服务的地址内容以 key = export 属性形式，放在 registryURL 中
+                // 有注册中心的逻辑：
+                // 将接口服务的地址内容以key = export属性形式，放在 registryURL 中
                 doExportUrl(registryURL.putAttribute(EXPORT_KEY, url), true, registerType);
             }
 

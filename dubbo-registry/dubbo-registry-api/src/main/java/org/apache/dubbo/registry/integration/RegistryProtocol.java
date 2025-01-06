@@ -158,6 +158,7 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
     // exposed.
     // provider url <--> registry url <--> exporter
     private final Map<String, Map<String, ExporterChangeableWrapper<?>>> bounds = new ConcurrentHashMap<>();
+    // 真正的底层通信协议
     protected Protocol protocol;
     protected ProxyFactory proxyFactory;
 
@@ -345,7 +346,7 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
         Invoker<?> invokerDelegate = new InvokerDelegate<>(originInvoker, providerUrl);
 
         ReferenceCountExporter<?> exporter =
-                // // 这里才是真实的 根据URL协议加载Protocol服务暴露
+                // // 这里才是真实的 根据URL协议加载Protocol服务暴露(开启端口)
                 exporterFactory.createExporter(providerUrlKey, () -> protocol.export(invokerDelegate));
         return (ExporterChangeableWrapper<T>) bounds.computeIfAbsent(providerUrlKey, k -> new ConcurrentHashMap<>())
                 .computeIfAbsent(
