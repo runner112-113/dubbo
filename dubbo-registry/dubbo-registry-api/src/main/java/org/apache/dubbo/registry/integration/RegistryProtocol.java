@@ -229,6 +229,7 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
                             1,
                             Collections.singletonList(registryName)),
                     () -> {
+                        // 通过指定的Registry进行注册
                         registry.register(registeredProviderUrl);
                         return null;
                     });
@@ -252,6 +253,7 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
         // 从 originInvoker 取出 "registry" 的属性值，结果取出了 zookeeper 值
         // 然后将 zookeeper 替换协议 "protocol" 属性的值就变成了 registryUrl
         URL registryUrl = getRegistryUrl(originInvoker);
+        // 服务真正暴露的url
         // url to export locally
         // providerUrl才是服务暴露的真实协议地址
         // 从 originInvoker.getUrl() 注册中心地址中取出 "export" 属性值

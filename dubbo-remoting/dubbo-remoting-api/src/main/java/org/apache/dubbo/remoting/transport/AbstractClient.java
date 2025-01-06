@@ -76,7 +76,7 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
 
         frameworkModel = url.getOrDefaultFrameworkModel();
 
-        // 初始化业务线程池，默认使用cached线程池
+        // 初始化业务线程池，默认使用fixed线程池
         initExecutor(url);
 
         reconnectDuaration = getReconnectDuration(url);

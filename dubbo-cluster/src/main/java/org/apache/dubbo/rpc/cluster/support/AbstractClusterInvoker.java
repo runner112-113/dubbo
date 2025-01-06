@@ -402,6 +402,7 @@ public abstract class AbstractClusterInvoker<T> implements ClusterInvoker<T> {
     }
 
     protected void checkInvokers(List<Invoker<T>> invokers, Invocation invocation) {
+        // 检查传入的 invokers 服务提供者列表，若集合为空，则会抛出无提供者异常
         if (CollectionUtils.isEmpty(invokers)) {
             throw new RpcException(
                     RpcException.NO_INVOKER_AVAILABLE_AFTER_FILTER,

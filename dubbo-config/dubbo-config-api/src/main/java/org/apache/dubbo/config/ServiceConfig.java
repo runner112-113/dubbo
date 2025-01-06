@@ -567,7 +567,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             serviceDescriptor = repository.registerService(getInterfaceClass());
         }
 
-        // 具备反射纸执行的ProviderModel
+        // 具备反射执行的ProviderModel
         providerModel = new ProviderModel(
                 serviceMetadata.getServiceKey(),
                 ref,
@@ -879,6 +879,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                             .build();
                 }
 
+                // 远程导出
                 url = exportRemote(url, registryURLs, registerType);
                 if (!isGeneric(generic) && !getScopeModel().isInternal()) {
                     // 注册元信息
@@ -894,7 +895,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                     if (StringUtils.isNotBlank(protocol)) {
                         URL localUrl =
                                 URLBuilder.from(url).setProtocol(protocol).build();
-                        // 远程导出
+                        // 远程导出 - ext.protocol
                         localUrl = exportRemote(localUrl, registryURLs, registerType);
                         if (!isGeneric(generic) && !getScopeModel().isInternal()) {
                             MetadataUtils.publishServiceDefinition(
@@ -987,6 +988,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         }
         // protocolSPI 为协议自定义扩展点
         // 将 invoker 按照指定的协议进行导出
+        // 即开启本地端口 对外提供服务
         Exporter<?> exporter = protocolSPI.export(invoker);
         exporters
                 .computeIfAbsent(registerType, k -> new CopyOnWriteArrayList<>())
