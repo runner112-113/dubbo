@@ -42,6 +42,7 @@ public class MigrationRuleHandler<T> {
     }
 
     public synchronized void doMigrate(MigrationRule rule) {
+        // 如果是ServiceDiscoveryMigrationInvoker 则强制应用级别订阅
         if (migrationInvoker instanceof ServiceDiscoveryMigrationInvoker) {
             refreshInvoker(MigrationStep.FORCE_APPLICATION, 1.0f, rule);
             return;
@@ -76,14 +77,17 @@ public class MigrationRuleHandler<T> {
             switch (step) {
                 case APPLICATION_FIRST:
                     // 默认和配置了应用级优先的服务发现则走这里
+                    // 接口和应用都订阅
                     migrationInvoker.migrateToApplicationFirstInvoker(newRule);
                     break;
                 case FORCE_APPLICATION:
                     // 配置了应用级服务发现则走这里
+                    // 订阅应用 销毁接口
                     success = migrationInvoker.migrateToForceApplicationInvoker(newRule);
                     break;
                 case FORCE_INTERFACE:
                     // 配置了接口级服务发现则走这里
+                    // 订阅接口 销毁应用
                 default:
                     success = migrationInvoker.migrateToForceInterfaceInvoker(newRule);
             }

@@ -25,11 +25,17 @@ import static org.apache.dubbo.registry.Constants.MIGRATION_RULE_STEP_KEY;
 import static org.apache.dubbo.registry.Constants.MIGRATION_RULE_THRESHOLD_KEY;
 
 public class SubMigrationRule {
+    // 接口名（接口 + : + 版本号）（必填）
     private String serviceKey;
+    // 状态名（必填）
     private MigrationStep step;
+    // 决策阈值
     private Float threshold;
+    // 灰度比例
     private Integer proportion;
+    // 延迟决策时间
     private Integer delay;
+    // 强制切换
     private Boolean force;
 
     public static SubMigrationRule parseFromMap(Map<String, Object> map) {

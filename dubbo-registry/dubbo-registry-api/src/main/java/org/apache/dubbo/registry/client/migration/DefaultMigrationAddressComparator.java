@@ -96,6 +96,7 @@ public class DefaultMigrationAddressComparator implements MigrationAddressCompar
             return false;
         }
 
+        // 阈值机制旨在进行流量切换前的地址数检查，如果应用级的可使用地址数与接口级的可用地址数对比后没达到阈值将检查失败
         return ((float) newAddressSize / (float) oldAddressSize) >= threshold;
     }
 

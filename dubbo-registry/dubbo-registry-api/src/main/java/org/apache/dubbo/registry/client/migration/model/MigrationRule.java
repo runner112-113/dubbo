@@ -79,13 +79,21 @@ import static org.apache.dubbo.registry.client.migration.MigrationRuleHandler.DU
  */
 public class MigrationRule {
 
+    // 消费者应用名（必填）
     private String key;
+    //  状态名（必填）
     private MigrationStep step;
+    // 决策阈值（默认1.0）
     private Float threshold;
+    // 灰度比例（默认100）
     private Integer proportion;
+    // 延迟决策时间（默认0）
     private Integer delay;
+    // 强制切换（默认 false）
     private Boolean force;
+    // 接口粒度配置（可选）
     private List<SubMigrationRule> interfaces;
+    //  应用粒度配置（可选）
     private List<SubMigrationRule> applications;
 
     private transient Map<String, SubMigrationRule> interfaceRules;

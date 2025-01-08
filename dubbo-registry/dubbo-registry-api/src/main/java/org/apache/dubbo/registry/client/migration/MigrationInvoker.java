@@ -65,8 +65,11 @@ public class MigrationInvoker<T> implements MigrationClusterInvoker<T> {
     private final ConsumerModel consumerModel;
     private final FrameworkStatusReportService reportService;
 
+    // 接口级订阅的Invoker
     private volatile ClusterInvoker<T> invoker;
+    // 应用级订阅的Invoker
     private volatile ClusterInvoker<T> serviceDiscoveryInvoker;
+    // 当前可用的Invoker
     private volatile ClusterInvoker<T> currentAvailableInvoker;
     private volatile MigrationStep step;
     private volatile MigrationRule rule;
