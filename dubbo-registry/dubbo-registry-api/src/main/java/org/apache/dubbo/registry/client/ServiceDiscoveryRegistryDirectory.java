@@ -493,6 +493,7 @@ public class ServiceDiscoveryRegistryDirectory<T> extends DynamicDirectory<T> {
                                                 .addParameter(CommonConstants.VERSION_KEY, k.getVersion()));
                                 RpcContext.getServiceContext().setConsumerUrl(newConsumerUrl);
                                 invoker = new InstanceWrappedInvoker<>(
+                                        // 创建providerUrl对应的invoker
                                         protocol.refer(serviceType, instanceAddressURL),
                                         newConsumerUrl,
                                         matchedProtocolServiceKey);
