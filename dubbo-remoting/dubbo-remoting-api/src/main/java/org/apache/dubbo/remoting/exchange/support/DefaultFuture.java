@@ -128,7 +128,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
     public static DefaultFuture newFuture(Channel channel, Request request, int timeout, ExecutorService executor) {
         final DefaultFuture future = new DefaultFuture(channel, request, timeout);
         future.setExecutor(executor);
-        // timeout check
+        // timeout check 超时的会返回超时并移除DefaultFuture
         timeoutCheck(future);
         return future;
     }
@@ -333,6 +333,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
 
         private void notifyTimeout(DefaultFuture future) {
             // create exception response.
+            // 构建超时响应返回
             Response timeoutResponse = new Response(future.getId());
             // set timeout status.
             timeoutResponse.setStatus(future.isSent() ? Response.SERVER_TIMEOUT : Response.CLIENT_TIMEOUT);
