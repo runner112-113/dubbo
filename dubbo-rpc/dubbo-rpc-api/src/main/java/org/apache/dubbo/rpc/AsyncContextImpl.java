@@ -31,6 +31,7 @@ public class AsyncContextImpl implements AsyncContext {
     private ClassLoader stagedClassLoader;
 
     public AsyncContextImpl() {
+        // 存储dubbo线程的上下文数据
         restoreContext = RpcContext.storeContext();
         restoreClassLoader = Thread.currentThread().getContextClassLoader();
     }

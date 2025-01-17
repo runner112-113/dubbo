@@ -100,7 +100,9 @@ public abstract class AbstractProxyInvoker<T> implements Invoker<T> {
             Object value = doInvoke(
                     proxy, invocation.getMethodName(), invocation.getParameterTypes(), invocation.getArguments());
 
+            // 使用Future进行包装
             CompletableFuture<Object> future = wrapWithFuture(value, invocation);
+            // 等待返回
             CompletableFuture<AppResponse> appResponseFuture = future.handle((obj, t) -> {
                 AppResponse result = new AppResponse(invocation);
                 if (t != null) {
@@ -147,9 +149,11 @@ public abstract class AbstractProxyInvoker<T> implements Invoker<T> {
     }
 
     private CompletableFuture<Object> wrapWithFuture(Object value, Invocation invocation) {
+        // 使用CompletableFuture返回
         if (value instanceof CompletableFuture) {
             invocation.put(PROVIDER_ASYNC_KEY, Boolean.TRUE);
             return (CompletableFuture<Object>) value;
+            // 是否开启了异步
         } else if (RpcContext.getServerAttachment().isAsyncStarted()) {
             invocation.put(PROVIDER_ASYNC_KEY, Boolean.TRUE);
             return ((AsyncContextImpl) (RpcContext.getServerAttachment().getAsyncContext())).getInternalFuture();
