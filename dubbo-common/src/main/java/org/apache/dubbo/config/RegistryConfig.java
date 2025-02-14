@@ -64,6 +64,7 @@ public class RegistryConfig extends AbstractConfig {
     /**
      * Protocol for register center
      */
+    //注册的协议：接口级，应用级
     private String protocol;
 
     /**

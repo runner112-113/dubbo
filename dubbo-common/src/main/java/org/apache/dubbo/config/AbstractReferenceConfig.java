@@ -47,6 +47,7 @@ public abstract class AbstractReferenceConfig extends AbstractInterfaceConfig {
     /**
      * Check if service provider exists, if not exists, it will be fast fail
      */
+    // 启动时检查提供者是否存在，true报错，false忽略
     protected Boolean check;
 
     /**

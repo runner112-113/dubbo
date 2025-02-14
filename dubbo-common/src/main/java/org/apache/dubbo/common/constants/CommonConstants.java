@@ -159,6 +159,8 @@ public interface CommonConstants {
 
     String TIME_COUNTDOWN_KEY = "timeout-countdown";
 
+    // 超时时间传递 deline模式
+    // 参考文档：https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/tasks/framework/timeout/
     String ENABLE_TIMEOUT_COUNTDOWN_KEY = "enable-timeout-countdown";
 
     String REMOVE_VALUE_PREFIX = "-";

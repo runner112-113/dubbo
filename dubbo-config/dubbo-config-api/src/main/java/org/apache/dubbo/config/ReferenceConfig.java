@@ -330,6 +330,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 this.refresh();
             }
             // auto detect proxy type
+            // 获取代理的方式：jdk、javassist
             String proxyType = getProxy();
             if (StringUtils.isBlank(proxyType) && DubboStub.class.isAssignableFrom(interfaceClass)) {
                 setProxy(CommonConstants.NATIVE_STUB);
@@ -621,6 +622,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 if (UrlUtils.isRegistry(url)) {
                     urls.add(url.putAttribute(REFER_KEY, referenceParameters));
                 } else {
+                    // 直连的话则添加到"peer"参数
                     URL peerUrl = getScopeModel()
                             .getApplicationModel()
                             .getBeanFactory()

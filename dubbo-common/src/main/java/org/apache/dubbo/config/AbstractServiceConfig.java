@@ -81,6 +81,7 @@ public abstract class AbstractServiceConfig extends AbstractInterfaceConfig {
      * after the service registered,and it needs to be disabled manually; if you want to disable the service, you also need
      * manual processing
      */
+    // 服务是否动态注册，如果设为false，注册后将显示为disable状态，需人工启用，并且服务提供者停止时，也不会自动取消注册，需人工禁用。
     protected Boolean dynamic; // true;
 
     /**
@@ -97,6 +98,7 @@ public abstract class AbstractServiceConfig extends AbstractInterfaceConfig {
      * The protocol list the service will export with
      * Also see {@link #protocolIds}, only one of them will work.
      */
+    // 服务准备暴露的协议：dubbo，rest等
     protected List<ProtocolConfig> protocols;
 
     /**
@@ -113,6 +115,7 @@ public abstract class AbstractServiceConfig extends AbstractInterfaceConfig {
     /**
      * Whether to register
      */
+    // 是否向此注册中心注册服务，如果设为false，将只订阅，不注册
     private Boolean register;
 
     /**

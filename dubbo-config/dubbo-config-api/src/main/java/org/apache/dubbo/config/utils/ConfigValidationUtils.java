@@ -198,8 +198,9 @@ public class ConfigValidationUtils {
     public static List<URL> loadRegistries(AbstractInterfaceConfig interfaceConfig, boolean provider) {
         // check && override if necessary
         List<URL> registryList = new ArrayList<>();
+        // 获取全局的应用config
         ApplicationConfig application = interfaceConfig.getApplication();
-        // 获取到一个接口配置注册地址
+        // 获取所有的服务注册地址
         List<RegistryConfig> registries = interfaceConfig.getRegistries();
         if (CollectionUtils.isNotEmpty(registries)) {
             for (RegistryConfig config : registries) {
@@ -244,6 +245,7 @@ public class ConfigValidationUtils {
                 }
             }
         }
+        // 双注册兼容处理
         return genCompatibleRegistries(interfaceConfig.getScopeModel(), registryList, provider);
     }
 
@@ -253,6 +255,7 @@ public class ConfigValidationUtils {
             if (provider) {
                 // for registries enabled service discovery, automatically register interface compatible addresses.
                 String registerMode;
+                // 如果是应用级别注册 - service-discovery-registry
                 if (SERVICE_REGISTRY_PROTOCOL.equals(registryURL.getProtocol())) {
                     registerMode = registryURL.getParameter(
                             REGISTER_MODE_KEY,
@@ -262,6 +265,7 @@ public class ConfigValidationUtils {
                         registerMode = DEFAULT_REGISTER_MODE_INSTANCE;
                     }
                     result.add(registryURL);
+                    // 如果注册模式为all，则添加接口注册地址
                     if (DEFAULT_REGISTER_MODE_ALL.equalsIgnoreCase(registerMode)
                             && registryNotExists(registryURL, registryList, REGISTRY_PROTOCOL)) {
                         URL interfaceCompatibleRegistryURL = URLBuilder.from(registryURL)
@@ -284,6 +288,7 @@ public class ConfigValidationUtils {
                     if ((DEFAULT_REGISTER_MODE_INSTANCE.equalsIgnoreCase(registerMode)
                                     || DEFAULT_REGISTER_MODE_ALL.equalsIgnoreCase(registerMode))
                             && registryNotExists(registryURL, registryList, SERVICE_REGISTRY_PROTOCOL)) {
+                        // 添加应用级注册
                         URL serviceDiscoveryRegistryURL = URLBuilder.from(registryURL)
                                 .setProtocol(SERVICE_REGISTRY_PROTOCOL)
                                 .removeParameter(REGISTRY_TYPE_KEY)

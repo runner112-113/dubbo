@@ -117,6 +117,8 @@ public class ContextFilter implements Filter, Filter.Listener {
             RpcContext.getServiceContext().setRemoteApplicationName(context.getAttachment(REMOTE_APPLICATION_KEY));
         }
 
+        // 传递timeout-countdown参数
+        // 解决第一链路已经超时而后面还在继续执行的情况
         long timeout = RpcUtils.getTimeout(invocation, -1);
         if (timeout != -1) {
             // pass to next hop

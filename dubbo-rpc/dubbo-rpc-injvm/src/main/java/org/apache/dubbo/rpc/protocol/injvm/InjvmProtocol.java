@@ -75,6 +75,7 @@ public class InjvmProtocol extends AbstractProtocol {
 
     @Override
     public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {
+        // serviceKey：{group}/{interfaceName}:{version}
         return new InjvmExporter<>(invoker, invoker.getUrl().getServiceKey(), exporterMap);
     }
 
@@ -96,6 +97,7 @@ public class InjvmProtocol extends AbstractProtocol {
         } else if (url.getParameter(GENERIC_KEY, false)) {
             // generic invocation is not local reference
             return false;
+            // 判断本地导出的是否存在
         } else if (getExporter(exporterMap, url) != null) {
             // Broadcast cluster means that multiple machines will be called,
             // which is not converted to injvm protocol at this time.

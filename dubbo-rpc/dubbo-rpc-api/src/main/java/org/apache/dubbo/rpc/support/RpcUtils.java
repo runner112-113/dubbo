@@ -269,6 +269,7 @@ public class RpcUtils {
     public static long getTimeout(
             URL url, String methodName, RpcContext context, Invocation invocation, long defaultTimeout) {
         long timeout = defaultTimeout;
+        // 从ClientAttachment获取timeout
         Object timeoutFromContext = context.getObjectAttachment(TIMEOUT_KEY);
         Object timeoutFromInvocation = invocation.getObjectAttachment(TIMEOUT_KEY);
 
@@ -283,7 +284,9 @@ public class RpcUtils {
     }
 
     public static int calculateTimeout(URL url, Invocation invocation, String methodName, long defaultTimeout) {
+        // 判断client有没有传过来TimeoutCountDown
         Object countdown = RpcContext.getClientAttachment().getObjectAttachment(TIME_COUNTDOWN_KEY);
+        // 默认超时1s
         int timeout = (int) defaultTimeout;
         if (countdown == null) {
             if (url != null) {
@@ -295,12 +298,14 @@ public class RpcUtils {
                 }
             }
         } else {
+            // 直接依据TimeoutCountDown来计算
             TimeoutCountDown timeoutCountDown = (TimeoutCountDown) countdown;
             timeout = (int) timeoutCountDown.timeRemaining(TimeUnit.MILLISECONDS);
             // pass timeout to remote server
             invocation.setObjectAttachment(TIMEOUT_ATTACHMENT_KEY, timeout);
         }
 
+        // 移除timeout-countdown
         invocation.getObjectAttachments().remove(TIME_COUNTDOWN_KEY);
         return timeout;
     }

@@ -95,6 +95,7 @@ public class ConsumerContextFilter implements ClusterFilter, ClusterFilter.Liste
         }
 
         // pass default timeout set by end user (ReferenceConfig)
+        // 判断是否已经超时
         Object countDown = RpcContext.getServerAttachment().getObjectAttachment(TIME_COUNTDOWN_KEY);
         if (countDown != null) {
             String methodName = RpcUtils.getMethodName(invocation);
@@ -105,6 +106,7 @@ public class ConsumerContextFilter implements ClusterFilter, ClusterFilter.Liste
                 context.setObjectAttachment(TIME_COUNTDOWN_KEY, countDown);
 
                 TimeoutCountDown timeoutCountDown = (TimeoutCountDown) countDown;
+                // 判断是否过期 如果过期则不继续向下执行
                 if (timeoutCountDown.isExpired()) {
                     return AsyncRpcResult.newDefaultAsyncResult(
                             new RpcException(

@@ -113,7 +113,7 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
             // 是否单向发送，不期望对端响应数据
             boolean isOneway = RpcUtils.isOneway(getUrl(), invocation);
 
-            // 计算超时
+            // 计算超时，默认超时1s
             int timeout = RpcUtils.calculateTimeout(getUrl(), invocation, methodName, DEFAULT_TIMEOUT);
             if (timeout <= 0) {
                 return AsyncRpcResult.newDefaultAsyncResult(

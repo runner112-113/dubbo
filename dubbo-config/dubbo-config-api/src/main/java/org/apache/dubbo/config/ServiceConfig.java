@@ -553,6 +553,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void doExportUrls(RegisterTypeEnum registerType) {
+        // Module的ServiceRepository
         ModuleServiceRepository repository = getScopeModel().getServiceRepository();
         ServiceDescriptor serviceDescriptor;
         final boolean serverService = ref instanceof ServerService;
@@ -567,7 +568,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             serviceDescriptor = repository.registerService(getInterfaceClass());
         }
 
-        // 具备反射执行的ProviderModel
+        // 构建ProviderModel
         providerModel = new ProviderModel(
                 serviceMetadata.getServiceKey(),
                 ref,
@@ -816,6 +817,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         }
 
         // export service
+        // 获取服务暴露host
         String host = findConfiguredHosts(protocolConfig, provider, params);
         if (NetUtils.isIPV6URLStdFormat(host)) {
             if (!host.contains("[")) {
@@ -826,6 +828,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             params.put(CommonConstants.IPV6_KEY, ipv6Host);
         }
 
+        // 获取服务暴露port
         Integer port =
                 findConfiguredPort(protocolConfig, provider, this.getExtensionLoader(Protocol.class), name, params);
         URL url = new ServiceConfigURL(
@@ -860,14 +863,17 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         if (!SCOPE_NONE.equalsIgnoreCase(scope)) {
 
             // export to local if the config is not remote (export to remote only when config is remote)
+            // loacl 导出
             if (!SCOPE_REMOTE.equalsIgnoreCase(scope)) {
                 // 本地导出
                 exportLocal(url);
             }
 
             // export to remote if the config is not local (export to local only when config is local)
+            // remote 导出
             if (!SCOPE_LOCAL.equalsIgnoreCase(scope)) {
                 // export to extra protocol is used in remote export
+                // 获取ext.protocol配置的额外导出协议
                 String extProtocol = url.getParameter("ext.protocol", "");
                 List<String> protocols = new ArrayList<>();
 
@@ -920,7 +926,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 }
 
                 // if protocol is only injvm ,not register
-                // 如果发现注册中心地址是写着 injvm 协议的话，则跳过不做任何导出处理
+                // 如果发现导出协议是 injvm 的话，则跳过不做任何导出处理
                 if (LOCAL_PROTOCOL.equalsIgnoreCase(url.getProtocol())) {
                     continue;
                 }
@@ -936,6 +942,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
                 // For providers, this is used to enable custom proxy to generate invoker
                 // 在提供方，这里支持自定义来生成代理
+                // 生成动态代理方式，可选：jdk/javassist
                 String proxy = url.getParameter(PROXY_KEY);
                 if (StringUtils.isNotEmpty(proxy)) {
                     registryURL = registryURL.addParameter(PROXY_KEY, proxy);
@@ -970,6 +977,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void doExportUrl(URL url, boolean withMetaData, RegisterTypeEnum registerType) {
+        // 通过register判断是否注册
         if (!url.getParameter(REGISTER_KEY, true)) {
             registerType = RegisterTypeEnum.MANUAL_REGISTER;
         }
@@ -983,6 +991,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         // 有两种方式，一种是利用Java自带的反射，另一种是利用字节码技术动态生成代理对象。
         // Dubbo默认会选择第二种方式，利用javassist动态创建Class对应的Wrapper对象，动态生成的Wrapper类会根据方法名和参数直接调用ref对应的方法，避免Java反射带来的性能问题。
         Invoker<?> invoker = proxyFactory.getInvoker(ref, (Class) interfaceClass, url);
+        // 带有元数据的话，则包装带上生产者元数据
         if (withMetaData) {
             invoker = new DelegateProviderMetaDataInvoker(invoker, this);
         }

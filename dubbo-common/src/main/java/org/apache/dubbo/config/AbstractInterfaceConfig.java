@@ -102,6 +102,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     /**
      * Strategies for generating dynamic agents，there are two strategies can be chosen: jdk and javassist
      */
+    // 生成动态代理方式，可选：jdk/javassist
     protected String proxy;
 
     /**
@@ -150,6 +151,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
      * The registry list the service will register to
      * Also see {@link #registryIds}, only one of them will work.
      */
+    // 待注册的注册中心地址
     protected List<RegistryConfig> registries;
 
     /**
@@ -181,6 +183,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     // callback limits
     private Integer callbacks;
     // the scope for referring/exporting a service, if it's local, it means searching in current JVM only.
+    // 导出的范围 local，remote
     private String scope;
 
     protected String tag;
