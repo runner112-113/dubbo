@@ -379,11 +379,12 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             serviceMetadata.getAttachments().putAll(referenceParameters);
 
             // 创建代理对象
-            //创建服务的代理对象
+            // 根据消费端参数创建服务的代理对象
             ref = createProxy(referenceParameters);
 
             //为服务元数据对象设置代理对象
             serviceMetadata.setTarget(ref);
+            // refClass
             serviceMetadata.addAttribute(PROXY_CLASS_REF, ref);
 
             consumerModel.setDestroyRunner(getDestroyRunner());
@@ -430,11 +431,15 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
     private Map<String, String> appendConfig() {
         Map<String, String> map = new HashMap<>(16);
 
+        // interface
         map.put(INTERFACE_KEY, interfaceName);
+        // side
         map.put(SIDE_KEY, CONSUMER_SIDE);
 
+        // 添加运行时相关的参数
         ReferenceConfigBase.appendRuntimeParameters(map);
 
+        // 非泛化调用
         if (!ProtocolUtils.isGeneric(generic)) {
             String revision = Version.getVersion(interfaceClass, version);
             if (StringUtils.isNotEmpty(revision)) {
@@ -454,9 +459,13 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             }
         }
 
+        // 添加Application级别参数
         AbstractConfig.appendParameters(map, getApplication());
+        // 添加Module级别参数
         AbstractConfig.appendParameters(map, getModule());
+        // 添加Consumer级别参数
         AbstractConfig.appendParameters(map, consumer);
+        // 添加当前Reference参数
         AbstractConfig.appendParameters(map, this);
 
         String hostToRegistry = ConfigUtils.getSystemProperty(DUBBO_IP_TO_REGISTRY);
@@ -676,12 +685,13 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
     }
 
     /**
-     * \create a reference invoker
+     * create a reference invoker
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void createInvoker() {
         // 这个url 为注册协议如：
         // registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=dubbo-demo-api-consumer&dubbo=2.0.2&pid=6204&qos.enable=false&qos.port=-1&registry=zookeeper&release=3.0.9&timestamp=1657439419495
+        // 单注册
         if (urls.size() == 1) {
             URL curUrl = urls.get(0);
             // 这个SPI对象是由字节码动态生成的自适应对象Protocol$Adaptie
@@ -699,6 +709,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             for (URL url : urls) {
                 // For multi-registry scenarios, it is not checked whether each referInvoker is available.
                 // Because this invoker may become available later.
+                // RegisterProtocol会修改url refer
                 invokers.add(protocolSPI.refer(interfaceClass, url));
 
                 if (UrlUtils.isRegistry(url)) {

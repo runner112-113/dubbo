@@ -89,8 +89,11 @@ public class GenericFilter implements Filter, Filter.Listener, ScopeModelAware {
                 && inv.getArguments() != null
                 && inv.getArguments().length == 3
                 && !GenericService.class.isAssignableFrom(invoker.getInterface())) {
+            // 方法名称
             String name = ((String) inv.getArguments()[0]).trim();
+            // 参数类型
             String[] types = (String[]) inv.getArguments()[1];
+            // 参数值
             Object[] args = (Object[]) inv.getArguments()[2];
             try {
                 Method method = findMethodByMethodSignature(invoker.getInterface(), name, types, inv.getServiceModel());

@@ -593,7 +593,8 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
                 parameters,
                 consumerAttribute);
         url = url.putAttribute(CONSUMER_URL_KEY, consumerUrl);
-        // 获取带迁移性质的Invoker对象
+        // 获取带迁移性质的Invoker对象 - Cluster
+        // ServiceDiscoveryMigrationInvoker 或者 MigrationInvoker
         ClusterInvoker<T> migrationInvoker = getMigrationInvoker(this, cluster, registry, type, url, consumerUrl);
         // 这一行回来执行迁移规则创建应用级优先的服务发现Invoker对象
         return interceptInvoker(migrationInvoker, url, consumerUrl);
