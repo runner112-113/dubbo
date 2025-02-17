@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ExtensionDirector implements ExtensionAccessor {
 
     /** 缓存扩展类型及其绑定的 ExtensionLoader 对象（每一个扩展类型都拥有属于自己的 ExtensionLoader） */
-    private final ConcurrentMap<Class<?>, ExtensionLoader<?>> extensionLoadersMap = new ConcurrentHashMap<>(64);
+    private final ConcurrentMap<Class<?>/*扩展类类型*/, ExtensionLoader<?>/*对应的ExtensionLoader*/> extensionLoadersMap = new ConcurrentHashMap<>(64);
     private final ConcurrentMap<Class<?>, ExtensionScope> extensionScopeMap = new ConcurrentHashMap<>(64);
     private final ExtensionDirector parent;
     private final ExtensionScope scope;

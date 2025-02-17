@@ -1382,8 +1382,10 @@ public class ExtensionLoader<T> {
                             + clazz.getName() + "), class " + clazz.getName() + " is not subtype of interface.");
         }
 
+        // 判断是否满足激活条件
         boolean isActive = loadClassIfActive(classLoader, clazz);
 
+        // 不满足则跳过
         if (!isActive) {
             return;
         }
@@ -1422,6 +1424,7 @@ public class ExtensionLoader<T> {
     private boolean loadClassIfActive(ClassLoader classLoader, Class<?> clazz) {
         Activate activate = clazz.getAnnotation(Activate.class);
 
+        // 没有@Activate限定 则true
         if (activate == null) {
             return true;
         }
@@ -1437,6 +1440,7 @@ public class ExtensionLoader<T> {
 
         boolean isActive = true;
 
+        // 判断@Activate中onClass指定的class是否都存在
         if (null != onClass && onClass.length > 0) {
             isActive = Arrays.stream(onClass)
                     .filter(StringUtils::isNotBlank)
