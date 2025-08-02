@@ -156,6 +156,7 @@ final class HeaderExchangeChannel implements ExchangeChannel {
             req.setTwoWay(true);
             req.setData(request);
         }
+        // 会添加到waiting map
         DefaultFuture future = DefaultFuture.newFuture(channel, req, timeout, executor);
         try {
             channel.send(req);
