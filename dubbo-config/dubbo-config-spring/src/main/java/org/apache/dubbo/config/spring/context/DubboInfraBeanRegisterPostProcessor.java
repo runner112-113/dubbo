@@ -83,6 +83,7 @@ public class DubboInfraBeanRegisterPostProcessor
         SpringExtensionInjector.get(moduleModel).init(applicationContext);
         DubboBeanUtils.getInitializationContext(beanFactory).setApplicationContext(applicationContext);
 
+        // 处理dubbo配置，放入dubbo的Environment中 在DubboBootstrap#initialize的时候会加载配置
         // Initialize dubbo Environment before ConfigManager
         // Extract dubbo props from Spring env and put them to app config
         ConfigurableEnvironment environment = (ConfigurableEnvironment) applicationContext.getEnvironment();
