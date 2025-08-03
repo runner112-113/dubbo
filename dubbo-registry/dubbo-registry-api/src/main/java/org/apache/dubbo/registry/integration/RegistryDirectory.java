@@ -448,6 +448,7 @@ public class RegistryDirectory<T> extends DynamicDirectory<T> {
                 continue;
             }
 
+            // 合并url
             URL url = mergeUrl(providerUrl);
 
             // Cache key is url that does not merge with consumer side parameters,

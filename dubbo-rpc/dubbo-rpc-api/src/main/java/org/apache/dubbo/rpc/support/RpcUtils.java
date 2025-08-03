@@ -278,6 +278,7 @@ public class RpcUtils {
         } else if (timeoutFromInvocation != null) {
             timeout = convertToNumber(timeoutFromInvocation, defaultTimeout);
         } else if (url != null) {
+            // 获取提供方的配置，提供方也没配置的话就使用默认的1s超时
             timeout = url.getMethodPositiveParameter(methodName, TIMEOUT_KEY, defaultTimeout);
         }
         return timeout;
