@@ -706,6 +706,7 @@ public abstract class AbstractConfig implements Serializable {
             try {
                 // check and init before do refresh
                 preProcessRefresh();
+                // configMode默认是STRICT,但是ServiceConfig和ReferenceConfig为OVERRIDE_IF_ABSENT
                 refreshWithPrefixes(getPrefixes(), getConfigMode());
             } catch (Exception e) {
                 logger.error(
@@ -784,6 +785,7 @@ public abstract class AbstractConfig implements Serializable {
                 String propertyName = extractPropertyName(method.getName());
 
                 // if config mode is OVERRIDE_IF_ABSENT and property has set, skip
+                // 如果是OVERRIDE_IF_ABSENT，已经有值了就跳过
                 if (overrideIfAbsent && isPropertySet(methods, propertyName)) {
                     continue;
                 }
