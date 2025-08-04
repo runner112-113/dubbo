@@ -128,6 +128,7 @@ public class DubboProtocol extends AbstractProtocol {
                                     + channel.getLocalAddress());
                 }
 
+                // 接收为Invocation 对象
                 Invocation inv = (Invocation) message;
                 // 拿到Invoker 没有传递过来就从DubboExporter中获取
                 Invoker<?> invoker = inv.getInvoker() == null ? getInvoker(channel, inv) : inv.getInvoker();

@@ -208,6 +208,7 @@ public class ConfigValidationUtils {
                 if (!config.isRefreshed()) {
                     config.refresh();
                 }
+                // 注册中心的地址
                 String address = config.getAddress();
                 if (StringUtils.isEmpty(address)) {
                     address = ANYHOST_VALUE;
@@ -218,6 +219,7 @@ public class ConfigValidationUtils {
                     AbstractConfig.appendParameters(map, config);
                     map.put(PATH_KEY, RegistryService.class.getName());
                     AbstractInterfaceConfig.appendRuntimeParameters(map);
+                    // 默认dubbo协议
                     if (!map.containsKey(PROTOCOL_KEY)) {
                         map.put(PROTOCOL_KEY, DUBBO_PROTOCOL);
                     }
