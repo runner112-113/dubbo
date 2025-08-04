@@ -348,6 +348,7 @@ public class ServiceDiscoveryRegistry extends FailbackRegistry {
             if (serviceInstancesChangedListener == null) {
                 serviceInstancesChangedListener = serviceDiscovery.createListener(serviceNames);
                 for (String serviceName : serviceNames) {
+                    // 去对应用获取实例集合
                     List<ServiceInstance> serviceInstances = serviceDiscovery.getInstances(serviceName);
                     if (CollectionUtils.isNotEmpty(serviceInstances)) {
                         // 获取到实例后，发布ServiceInstancesChangedEvent去填充元信息
