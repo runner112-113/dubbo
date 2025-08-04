@@ -102,6 +102,7 @@ public class ContextFilter implements Filter, Filter.Listener {
             attachments = newAttach;
         }
 
+        // pass environment parameters in the whole invocation.
         RpcContext.getServiceContext().setInvoker(invoker).setInvocation(invocation);
 
         RpcContext context = RpcContext.getServerAttachment();

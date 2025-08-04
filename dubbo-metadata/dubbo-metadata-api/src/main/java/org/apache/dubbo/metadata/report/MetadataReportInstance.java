@@ -88,6 +88,7 @@ public class MetadataReportInstance implements Disposable {
         }
     }
 
+    // 元数据上报
     private void init(MetadataReportConfig config, MetadataReportFactory metadataReportFactory) {
         URL url = config.toUrl();
         if (METADATA_REPORT_KEY.equals(url.getProtocol())) {

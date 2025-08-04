@@ -148,6 +148,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
     /**
      * The flag whether a service has unexported ,if the method unexported is invoked, the value is true
      */
+    // 是否取消导出了
     private transient volatile boolean unexported;
 
     private transient volatile AtomicBoolean initialized = new AtomicBoolean(false);
@@ -302,7 +303,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         serviceMetadata.setServiceType(getInterfaceClass());
         // 设置具体的实现类
         serviceMetadata.setTarget(getRef());
-        // 生成serviceKey：group/serviceInterfaceName:version
+        // 生成serviceKey： {group}/{path}:{version}
         serviceMetadata.generateServiceKey();
     }
 
@@ -325,11 +326,13 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 return;
             }
 
-            // Dubbo Config 属性重写
+            // Dubbo Config 属性重写 (属性覆盖)
             if (!this.isRefreshed()) {
                 this.refresh();
             }
+            // 是否export服务，默认为true
             if (this.shouldExport()) {
+                // 处理ServiceMetadata
                 this.init();
                 // 是否有设置延迟 delay 导出属性
                 if (shouldDelay()) {
@@ -570,6 +573,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
         // 构建ProviderModel
         providerModel = new ProviderModel(
+                // {group}/{path}:{version}
                 serviceMetadata.getServiceKey(),
                 ref,
                 serviceDescriptor,
@@ -613,7 +617,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         // init serviceMetadata attachments
         serviceMetadata.getAttachments().putAll(map);
 
-        // 构建最终的注册url
+        // 构建最终的注册到注册中心的url
         URL url = buildUrl(protocolConfig, map);
 
         processServiceExecutor(url);

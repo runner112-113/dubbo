@@ -509,7 +509,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             // 从注册表中获取URL并将其聚合。这个其实就是初始化一下注册中心的url配置
             aggregateUrlFromRegistry(referenceParameters);
         }
-        // 创建远程引用，创建远程引用调用器
+        // 创建远程引用，创建远程引用调用器 Invoker
         createInvoker();
 
         if (logger.isInfoEnabled()) {
