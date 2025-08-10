@@ -56,6 +56,12 @@ import static org.apache.dubbo.registry.client.metadata.ServiceInstanceMetadataU
 public class MetadataUtils {
     public static final ErrorTypeAwareLogger logger = LoggerFactory.getErrorTypeAwareLogger(MetadataUtils.class);
 
+    /**
+     * 发布Service元数据
+     * @param url
+     * @param serviceDescriptor
+     * @param applicationModel
+     */
     public static void publishServiceDefinition(
             URL url, ServiceDescriptor serviceDescriptor, ApplicationModel applicationModel) {
         if (getMetadataReports(applicationModel).size() == 0) {
@@ -67,6 +73,7 @@ public class MetadataUtils {
 
         try {
             String side = url.getSide();
+            // 生产端
             if (PROVIDER_SIDE.equalsIgnoreCase(side)) {
                 String serviceKey = url.getServiceKey();
                 FullServiceDefinition serviceDefinition = serviceDescriptor.getFullServiceDefinition(serviceKey);
@@ -91,6 +98,7 @@ public class MetadataUtils {
                     }
                 }
             } else {
+                // 消费端
                 for (Map.Entry<String, MetadataReport> entry :
                         getMetadataReports(applicationModel).entrySet()) {
                     MetadataReport metadataReport = entry.getValue();
@@ -114,6 +122,11 @@ public class MetadataUtils {
         }
     }
 
+    /**
+     * 暴露MetadataService   元数据 LOCAL模式会执行此RPC
+     * @param instance
+     * @return
+     */
     public static ProxyHolder referProxy(ServiceInstance instance) {
         MetadataServiceURLBuilder builder;
         ExtensionLoader<MetadataServiceURLBuilder> loader =
@@ -175,16 +188,20 @@ public class MetadataUtils {
      */
     public static MetadataInfo getRemoteMetadata(
             String revision, List<ServiceInstance> instances, MetadataReport metadataReport) {
+        // 从应用中随机选取一个instance
         ServiceInstance instance = selectInstance(instances);
+        // 判断元数据的存储模式 默认LOCAL
         String metadataType = ServiceInstanceMetadataUtils.getMetadataStorageType(instance);
         MetadataInfo metadataInfo;
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("Instance " + instance.getAddress() + " is using metadata type " + metadataType);
             }
+            // 远程获取
             if (REMOTE_METADATA_STORAGE_TYPE.equals(metadataType)) {
                 metadataInfo = MetadataUtils.getMetadata(revision, instance, metadataReport);
             } else {
+                // 通过MetadataService RPC去获取
                 // change the instance used to communicate to avoid all requests route to the same instance
                 ProxyHolder proxyHolder = null;
                 try {
@@ -192,6 +209,7 @@ public class MetadataUtils {
                     proxyHolder = MetadataUtils.referProxy(instance);
                     metadataInfo = proxyHolder
                             .getProxy()
+                            // 走RPC获取
                             .getMetadataInfo(ServiceInstanceMetadataUtils.getExportedServicesRevision(instance));
                 } finally {
                     MetadataUtils.destroyProxy(proxyHolder);

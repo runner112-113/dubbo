@@ -69,6 +69,7 @@ public abstract class AbstractServiceDiscovery implements ServiceDiscovery {
     protected final String serviceName;
     protected volatile ServiceInstance serviceInstance;
     protected volatile MetadataInfo metadataInfo;
+    // 本地元数据 revision --> MetadataInfo
     protected final ConcurrentHashMap<String, MetadataInfoStat> metadataInfos = new ConcurrentHashMap<>();
     protected final ScheduledFuture<?> refreshCacheFuture;
     protected MetadataReport metadataReport;
@@ -401,6 +402,7 @@ public abstract class AbstractServiceDiscovery implements ServiceDiscovery {
             }
         }
         MetadataInfo clonedMetadataInfo = metadataInfo.clone();
+        // 存储到本地缓存
         metadataInfos.put(metadataInfo.getRevision(), new MetadataInfoStat(clonedMetadataInfo));
     }
 

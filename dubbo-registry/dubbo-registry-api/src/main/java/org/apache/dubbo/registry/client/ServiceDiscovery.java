@@ -33,6 +33,10 @@ import static org.apache.dubbo.common.constants.CommonConstants.REGISTRY_DELAY_N
  */
 public interface ServiceDiscovery extends RegistryService, Prioritized {
 
+    /**
+     * aggregates interface level data into MetadataInfo by mainly interacting with MetadataService.
+     * @throws RuntimeException
+     */
     void register() throws RuntimeException;
 
     void update() throws RuntimeException;

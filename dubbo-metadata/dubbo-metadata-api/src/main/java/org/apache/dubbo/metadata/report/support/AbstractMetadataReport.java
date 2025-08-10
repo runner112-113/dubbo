@@ -307,10 +307,11 @@ public abstract class AbstractMetadataReport implements MetadataReport {
                             logger.info("store provider metadata. Identifier : " + providerMetadataIdentifier
                                     + "; definition: " + serviceDefinition);
                         }
-                        // 加入缓存，后台有reportTimerScheduler线程每隔一天同步一次
+                        // 加入本地缓存，后台有reportTimerScheduler线程每隔一天同步一次
                         allMetadataReports.put(providerMetadataIdentifier, serviceDefinition);
                         failedReports.remove(providerMetadataIdentifier);
                         String data = JsonUtils.toJson(serviceDefinition);
+                        // 上报远程
                         doStoreProviderMetadata(providerMetadataIdentifier, data);
                         saveProperties(providerMetadataIdentifier, data, true, !syncReport);
                     } catch (Exception e) {

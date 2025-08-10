@@ -128,6 +128,7 @@ public class NacosServiceDiscovery extends AbstractServiceDiscovery {
 
         try {
             this.serviceInstance = newServiceInstance;
+            // 元数据上报到本地缓存
             reportMetadata(newServiceInstance.getServiceMetadata());
             execute(namingService, service -> {
                 Instance instance = toInstance(serviceInstance);
